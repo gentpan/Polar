@@ -1,4 +1,6 @@
 
+;window.polarEnabledScripts=JSON.parse(document.currentScript?.dataset.shanyingModules||'[]');
+
 /*! SunCalc 1.9.0 — BSD-2-Clause
 Copyright (c) 2014, Vladimir Agafonkin
 All rights reserved.
@@ -4241,8 +4243,12 @@ if(window.polarEnabledScripts.includes("feng-visitor-stats")){
     for(const el of document.querySelectorAll('[data-footer-views]'))el.textContent=(Number(result.data.views)>=10000?(Number(result.data.views)/10000).toLocaleString('zh-CN',{maximumFractionDigits:1})+'万':Number(result.data.views).toLocaleString());
     for(const el of document.querySelectorAll('[data-footer-location]')){
      const location=result.data.location,code=location?.code?.toUpperCase();
-     const flag=/^[A-Z]{2}$/.test(code||'')?String.fromCodePoint(...[...code].map(c=>127397+c.charCodeAt(0)))+' ':'';
-     el.textContent=location?.label?flag+location.label:'暂未获取';
+     el.textContent=location?.label||'暂未获取';
+     if(location?.label&&/^[A-Z]{2}$/.test(code||'')){
+      const flag=document.createElement('img');flag.src='https://flagcdn.io/flags/4x3/'+code.toLowerCase()+'.svg';
+      flag.alt='';flag.width=18;flag.height=14;flag.className='feng-footer-country-flag';
+      flag.addEventListener('error',()=>flag.remove(),{once:true});el.prepend(flag);
+     }
     }
    }catch{for(const el of document.querySelectorAll('[data-footer-online]'))el.textContent='—';}finally{clearTimeout(timer);}
   });

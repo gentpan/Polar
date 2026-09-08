@@ -26,7 +26,8 @@ for handle,source in order['styles'].items():
  (fonts if 'font' in source or handle in ('feng-code-font','feng-space-grotesk') else styles).append(stylesheet(handle,source))
 def script(handle,path,enabled):
  return '\n;/* '+handle+' */\nif(window.'+enabled+'.includes('+json.dumps(handle)+')){\n'+path.read_text()+'\n}\n'
-scripts=['\n/*! SunCalc 1.9.0 — BSD-2-Clause\n'+(src/'vendor/suncalc/LICENSE').read_text()+'\n*/\n'+(src/'vendor/suncalc/suncalc.js').read_text()]
+bootstrap="\n;window.polarEnabledScripts=JSON.parse(document.currentScript?.dataset.shanyingModules||'[]');\n"
+scripts=[bootstrap+'\n/*! SunCalc 1.9.0 — BSD-2-Clause\n'+(src/'vendor/suncalc/LICENSE').read_text()+'\n*/\n'+(src/'vendor/suncalc/suncalc.js').read_text()]
 scripts += [script(handle,src/source,'polarEnabledScripts') for handle,source in order['scripts'].items()]
 lucide=base/'lucide-motion'
 subprocess.run(['node',str(lucide/'build.mjs')],check=True)
@@ -35,7 +36,8 @@ scripts.append('\n;/* Statistic odometer */\n'+(src/'assets/js/stat-roll.js').re
 (theme/'assets/css/main.css').write_text(''.join(fonts+styles))
 (theme/'assets/js/main.js').write_text(''.join(scripts))
 for path in [theme/'inc/asset-bundles.json',base/'manifest.json']:path.write_text(json.dumps(manifest,indent=2))
-admin=[script(handle,src/'assets/js'/name,'polarEnabledAdminScripts') for handle,name in order['admin_scripts'].items()]
+admin=[bootstrap.replace('polarEnabledScripts','polarEnabledAdminScripts')]
+admin += [script(handle,src/'assets/js'/name,'polarEnabledAdminScripts') for handle,name in order['admin_scripts'].items()]
 (theme/'assets/js/admin.js').write_text(''.join(admin))
 admincss=[(src/'assets/css'/name).read_text() for name in ('admin.css','admin-square.css')]
 admincss.extend(stylesheet('admin-'+name,'assets/css/'+name) for name in ('tokens.css','editor.css','reading.css'))

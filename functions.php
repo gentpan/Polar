@@ -108,11 +108,17 @@ add_action('wp_enqueue_scripts',function(){
    $scripts->registered[$handle]->src=false;
   }
  }
- wp_enqueue_style('polar-theme',get_theme_file_uri('/assets/css/main.css'),array('feng-fontawesome-pro'),feng_asset_version('/assets/css/main.css'));
- $dependencies=array_values(array_filter($scripts->queue,fn($handle)=>$handle!=='polar-theme'));
- wp_enqueue_script('polar-theme',get_theme_file_uri('/assets/js/main.js'),$dependencies,feng_asset_version('/assets/js/main.js'),true);
- wp_add_inline_script('polar-theme','window.polarEnabledScripts='.wp_json_encode($enabled).';','before');
+ wp_enqueue_style('shanying-theme',get_theme_file_uri('/assets/css/main.css'),array('feng-fontawesome-pro'),feng_asset_version('/assets/css/main.css'));
+ $dependencies=array_values(array_filter($scripts->queue,fn($handle)=>$handle!=='shanying-theme'));
+ wp_enqueue_script('shanying-theme',get_theme_file_uri('/assets/js/main.js'),$dependencies,feng_asset_version('/assets/js/main.js'),true);
+ $GLOBALS['shanying_script_modules']['shanying-theme']=$enabled;
 },PHP_INT_MAX);
+
+/** Attach per-request module selection as data, read by the bundle itself. */
+add_filter('script_loader_tag',function($tag,$handle){
+ if(!isset($GLOBALS['shanying_script_modules'][$handle]))return $tag;
+ return preg_replace('/<script\b/','<script data-shanying-modules="'.esc_attr(wp_json_encode($GLOBALS['shanying_script_modules'][$handle])).'"',$tag,1);
+},10,2);
 
 /** The dashboard keeps its own small bundle and only runs enqueued modules. */
 add_action('admin_enqueue_scripts',function(){
@@ -123,7 +129,7 @@ add_action('admin_enqueue_scripts',function(){
    $scripts->registered[$handle]->src=false;
   }
  }
- if($enabled){wp_enqueue_script('polar-admin',get_theme_file_uri('/assets/js/admin.js'),$deps,feng_asset_version('/assets/js/admin.js'),true);wp_add_inline_script('polar-admin','window.polarEnabledAdminScripts='.wp_json_encode($enabled).';','before');}
+ if($enabled){wp_enqueue_script('shanying-admin',get_theme_file_uri('/assets/js/admin.js'),$deps,feng_asset_version('/assets/js/admin.js'),true);$GLOBALS['shanying_script_modules']['shanying-admin']=$enabled;}
  $styles=wp_styles();
  if(isset($styles->registered['feng-admin-square'])){$styles->registered['feng-admin-square']->src=false;if(!wp_style_is('feng-admin','enqueued'))wp_enqueue_style('feng-admin',get_theme_file_uri('/assets/css/admin.css'),array(),feng_asset_version('/assets/css/admin.css'));}
 },PHP_INT_MAX);

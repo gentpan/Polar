@@ -1,4 +1,6 @@
 
+;window.polarEnabledAdminScripts=JSON.parse(document.currentScript?.dataset.shanyingModules||'[]');
+
 ;/* feng-admin */
 if(window.polarEnabledAdminScripts.includes("feng-admin")){
 /* WordPress media selection; settings still submit through the native Settings API. */

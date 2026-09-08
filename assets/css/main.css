@@ -2542,6 +2542,8 @@ body:is(.home,.blog) :is(.xf-stage,.xf-stream,.xf-collections,.xf-note-card,.xf-
 #xf-view .feng-article-hub .feng-category-list__body time{color:var(--xf-muted);opacity:1;}
 #xf-view .feng-article-hub [data-category-list]{margin-bottom:0;}
 
+.feng-footer-country-flag{display:inline-block;width:18px;height:14px;object-fit:contain;margin-right:5px;vertical-align:-2px;border-radius:0;}
+
 /* feng-typography */
 /* Brand and navigation can be switched independently without changing body typography. */
 :root {

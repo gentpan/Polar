@@ -18,9 +18,19 @@
 
 ## 主题预览
 
-![ShanYing 山映主题概念预览](screenshot.png)
+以下图片截取自本地运行的山映主题，展示实际页面。首页背景会随时间和天气变化；浅色截图保留了拍摄时的夜景 Hero。
 
-上图为主题设计概念图，并非当前运行网站的实拍截图；具体页面以实际安装效果为准。
+### 首页 · 深色
+
+![山映首页深色实截图](assets/images/previews/home-dark.png)
+
+### 首页 · 浅色
+
+![山映首页浅色实截图](assets/images/previews/home-light.png)
+
+### 存档
+
+![山映存档页实截图](assets/images/previews/archives.png)
 
 ## 功能
 
