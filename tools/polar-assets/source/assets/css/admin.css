@@ -1,0 +1,94 @@
+/* Theme settings layout; inputs, buttons, notices and media dialogs remain native. */
+.feng-admin{max-width:1200px;color:#1d2327;margin-right:24px;}
+.feng-admin-header{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:26px 0 28px;}
+.feng-admin-header h1{font-size:26px;font-weight:600;padding:0;margin:0 0 8px;}
+.feng-admin-header p{margin:0;color:#646970;font-size:13px;line-height:1.8;}
+.feng-admin-header .feng-admin-eyebrow{font-size:10px;letter-spacing:.12em;margin-bottom:8px;color:#787c82;}
+.feng-admin-header>.button{flex-shrink:0;}
+.feng-admin-header .dashicons-external,#feng-ai-editor-tools .dashicons-external{width:16px;height:16px;font-size:16px;vertical-align:middle;}
+.feng-admin-shell{display:grid;grid-template-columns:190px minmax(0,1fr);gap:24px;align-items:start;}
+.feng-admin .feng-admin-tabs{position:sticky;top:50px;display:flex;flex-direction:column;gap:4px;border:0;padding:12px 0;margin:0;}
+.feng-admin .feng-nav-label{display:block;padding:0 14px 12px;color:#787c82;font-size:11px;}
+.feng-admin .feng-admin-tabs .nav-tab{display:flex;align-items:center;gap:10px;float:none;margin:0;padding:11px 14px;border:0;border-radius:8px;background:transparent;color:#50575e;font-size:13px;font-weight:400;white-space:normal;transition:background .2s,color .2s;}
+.feng-admin .feng-admin-tabs .nav-tab:hover{background:#e7e9ec;color:#1d2327;}
+.feng-admin .feng-admin-tabs .nav-tab-active{background:#fff;color:var(--wp-admin-theme-color,#2271b1);box-shadow:0 1px 4px rgb(0 0 0 / .04);font-weight:600;}
+.feng-admin-tabs .dashicons{font-size:18px;width:18px;height:18px;flex:0 0 18px;}
+.feng-admin-content{min-width:0;}
+.feng-admin section[hidden],.feng-admin form[hidden],.feng-ai-result[hidden]{display:none!important;}
+.feng-admin .feng-settings-section{margin:0 0 20px;padding:28px 30px;background:#fff;border:1px solid #dcdcde;border-radius:12px;box-shadow:0 2px 5px rgb(0 0 0 / .02);}
+.feng-section-header{margin-bottom:22px;padding-bottom:20px;border-bottom:1px solid #f0f0f1;}
+.feng-section-header h2{margin:0 0 8px;font-size:18px;line-height:1.5;font-weight:600;}
+.feng-section-header p{margin:0;color:#646970;line-height:1.8;font-size:13px;}
+.feng-admin .form-table{margin-top:0;table-layout:fixed;}
+.feng-admin .feng-label-column{width:190px;}
+.feng-admin .form-table th{width:170px;padding:20px 20px 20px 0;font-size:13px;font-weight:500;line-height:1.7;}
+.feng-admin .form-table td{padding:16px 0;vertical-align:top;font-size:13px;}
+.feng-admin .form-table tr:not(.feng-field-group)+tr:not(.feng-field-group)>:is(th,td){border-top:1px solid #f3f4f5;}
+.feng-admin .form-table .feng-field-group th{width:auto;padding:24px 0 10px;color:#1d2327;font-size:12px;font-weight:600;letter-spacing:.025em;}
+.feng-admin .form-table .feng-field-group:first-child th{padding-top:0;}
+.feng-admin .regular-text,.feng-admin .large-text{box-sizing:border-box;width:100%;max-width:100%;}
+.feng-admin .regular-text,.feng-admin select{min-height:36px;}
+.feng-admin select{min-width:min(220px,100%);max-width:100%;}
+.feng-admin textarea{padding:9px 11px;line-height:1.7;resize:vertical;}
+.feng-admin input[type=number]{width:100px;}.feng-admin input[type=date]{width:190px;}.feng-admin input[type=color]{width:80px;}
+.feng-field-control{display:flex;align-items:center;flex-wrap:wrap;gap:8px;}
+.feng-field-control:has([data-music-rows]){display:block;}
+.feng-admin .description{color:#787c82;font-size:12px;line-height:1.8;margin-top:8px;}
+.feng-native-links{padding:20px;background:#f6f7f7;border-radius:8px;margin-top:20px;}
+.feng-native-links h3{font-size:13px;margin:0 0 7px;}.feng-native-links p{color:#646970;margin:0 0 14px;line-height:1.8;}.feng-native-links .button{margin-bottom:4px;}
+.feng-admin-save{position:sticky;bottom:16px;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 20px;background:#fff;border:1px solid #dcdcde;border-radius:10px;box-shadow:0 4px 20px rgb(0 0 0 / .05);margin:20px 0;}
+.feng-admin-save>span{font-size:12px;color:#787c82;}.feng-admin-save .button{flex-shrink:0;}.feng-admin-save [data-dirty]{color:#996800;}
+.feng-admin .feng-ai-heading{padding:10px 0 4px;border:0;}
+.feng-admin .feng-ai-config+.feng-ai-config{margin-top:24px;}
+.feng-ai-status:empty{display:none;}.feng-ai-status.notice{margin:12px 0;padding:10px 12px;}.feng-ai-status img,.feng-ai-result img{display:block;max-width:100%;max-height:340px;height:auto;margin-top:12px;}
+.feng-ai-actions{display:flex;gap:8px;flex-wrap:wrap;}.feng-ai-result{margin:16px 0;padding:12px;border:1px solid #dcdcde;}.feng-ai-result p:first-child{margin-top:0;}#feng-ai-editor-tools{max-width:920px;}#feng-ai-editor-tools .spinner,.feng-admin .spinner{float:none;margin:0 8px;vertical-align:middle;}.feng-ai-result input,.feng-ai-result textarea{box-sizing:border-box;}.feng-ai-result a{margin-left:8px;}
+.feng-pet-admin-gallery{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:20px 0;}
+.feng-pet-admin-gallery figure{margin:0;padding:12px 6px;text-align:center;background:#f6f7f7;border:1px solid #eef0f1;border-radius:10px;}.feng-pet-admin-gallery svg{width:76px;max-width:100%;height:76px;}.feng-pet-admin-gallery figcaption{margin-top:6px;font-size:12px;}
+.feng-music-admin-track{margin:20px 0;padding:18px;border:1px solid #dcdcde;border-radius:10px;background:#fafafa;min-width:0;}.feng-music-admin-track legend{font-weight:600;padding:0 6px;}.feng-music-admin-track label{display:inline-block;margin-bottom:6px;font-size:12px;}.feng-music-admin-track .button{margin-top:7px;}.feng-music-admin-track .button-link-delete{margin-left:8px;}.feng-admin .feng-music-admin-track p{margin:0 0 16px;}
+@media(max-width:1000px){.feng-admin-shell{grid-template-columns:160px minmax(0,1fr);gap:16px;}.feng-admin .feng-settings-section{padding:22px;}.feng-admin .form-table th{width:140px;}.feng-admin .feng-label-column{width:160px;}}
+@media(max-width:782px){.feng-admin{margin-right:12px;}.feng-admin-header{padding:20px 0;}.feng-admin-shell{display:block;}.feng-admin .feng-admin-tabs{position:static;display:flex;flex-direction:row;flex-wrap:wrap;gap:5px;padding:0;margin-bottom:18px;}.feng-admin .feng-nav-label{display:none;}.feng-admin .feng-admin-tabs .nav-tab{padding:9px 11px;font-size:12px;}.feng-admin .feng-settings-section{padding:20px 18px;}.feng-admin .form-table{table-layout:auto;}.feng-admin .form-table colgroup{display:none;}.feng-admin .form-table th{display:block;width:auto;padding:17px 0 6px;}.feng-admin .form-table td{display:block;padding:0 0 16px;}.feng-admin .form-table tr:not(.feng-field-group)+tr:not(.feng-field-group)>td{border:0;}.feng-admin .form-table .feng-field-group th{padding:22px 0 10px;}.feng-admin .regular-text{width:100%;}.feng-admin-save{bottom:10px;padding:12px;}.feng-admin-save>span{font-size:11px;}.feng-ai-actions .button{min-height:36px;}}
+@media(max-width:500px){.feng-pet-admin-gallery{grid-template-columns:repeat(2,minmax(0,1fr));}.feng-admin-header h1{font-size:23px;}.feng-admin-header>div>p:last-child{max-width:210px;}.feng-admin .feng-admin-tabs .dashicons{display:none;}}
+@media(prefers-reduced-motion:reduce){.feng-admin .nav-tab{transition:none;}}
+
+/* Compact native editor sidebar tools. */
+#side-sortables #feng-ai-editor-tools,#side-sortables [data-travel-editor]{font-size:12px;line-height:1.65;}
+#side-sortables #feng-ai-editor-tools>p:first-of-type,#side-sortables [data-travel-editor]>p:first-child{color:#646970;}
+#side-sortables .feng-ai-actions{display:grid;grid-template-columns:1fr;gap:6px;}
+#side-sortables #feng-ai-editor-tools select,#side-sortables [data-travel-editor] input:not([type=hidden]),#side-sortables [data-travel-editor] select{width:100%;max-width:100%;box-sizing:border-box;}
+#side-sortables #feng-ai-editor-tools .button,#side-sortables [data-place-search]{width:100%;margin-top:6px;white-space:normal;}
+#side-sortables .feng-ai-result{padding:10px;border-radius:6px;background:#f6f7f7;}
+#side-sortables .feng-ai-result img{border-radius:4px;}
+#side-sortables [data-travel-editor] label{display:block;margin:4px 0;font-weight:500;}
+#side-sortables [data-place-results] .button{white-space:normal;text-align:left;height:auto;width:100%;margin-bottom:6px;}
+#side-sortables .feng-ai-status{overflow-wrap:anywhere;}
+
+/* Theme identity, shared by every settings page. */
+.feng-admin-header{align-items:flex-start;padding:24px 26px;margin:20px 0 24px;background:#fff;border:1px solid #dfe4ea;border-radius:16px;gap:20px;}
+.feng-admin-brandline{display:flex;align-items:center;gap:12px;margin-bottom:10px;}
+.feng-admin-emblem{display:grid;place-items:center;width:38px;height:38px;flex-shrink:0;background:transparent;border:0;box-shadow:none;}
+.feng-admin-emblem img{display:block;width:100%;height:100%;object-fit:contain;}
+.feng-admin-brandline h1{display:flex;align-items:center;gap:12px;margin:0;font-size:23px;letter-spacing:.02em;}
+.feng-admin-title-label{font-size:12px;font-weight:400;color:#787f88;letter-spacing:0;}
+.feng-admin-header .feng-admin-brand>p{font-size:12px;}
+.feng-admin-header-right{display:flex;flex-direction:column;align-items:flex-end;gap:13px;flex-shrink:0;}
+.feng-admin-badges{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.feng-admin-badge{display:inline-flex;align-items:center;min-height:24px;box-sizing:border-box;padding:3px 8px;border:1px solid;border-radius:6px;font-size:10px;line-height:1.4;font-weight:600;letter-spacing:.04em;white-space:nowrap;}
+.feng-admin-badge--theme{background:#edf3ff;border-color:#ceddff;color:#355da0;}.feng-admin-badge--version{background:#eff8f0;border-color:#cce5ce;color:#397044;}.feng-admin-badge--author{background:#fff3e9;border-color:#f2dac5;color:#995d31;}
+.feng-admin-site-link{font-size:11px;color:#646970;text-decoration:none;}.feng-admin-site-link:hover{color:#2271b1;}.feng-admin-site-link:focus-visible{outline:2px solid #2271b1;outline-offset:4px;}
+@media(max-width:600px){.feng-admin-header{padding:18px;flex-wrap:wrap;gap:14px;}.feng-admin-header-right{width:100%;flex-direction:row;justify-content:space-between;align-items:center;}.feng-admin-brandline h1{font-size:21px;}.feng-admin-title-label{font-size:11px;}}
+
+/* Inline media controls and aligned checkbox rows. */
+.feng-admin .feng-field-control:has(>[data-feng-media]){display:grid;grid-template-columns:minmax(0,1fr) 36px 36px;align-items:center;gap:7px;width:100%;}
+.feng-admin .feng-field-control:has(>[data-feng-media])>.regular-text{width:100%;min-width:0;margin:0;}
+.feng-admin .button.feng-media-icon{display:inline-flex;align-items:center;justify-content:center;flex:none;width:36px;min-width:36px;height:36px;min-height:36px;padding:0;margin:0;border:1px solid #cddcff;border-radius:9px;background:#f0f5ff;color:#4163c9;line-height:1;box-shadow:none;}
+.feng-admin .feng-media-icon .dashicons{font-size:18px;width:18px;height:18px;}
+.feng-admin .button.feng-media-icon:hover{background:#e3edff;border-color:#91adea;}.feng-admin .button.feng-media-icon--clear{background:#f6f7f8;border-color:#dcdcde;color:#6c737d;}.feng-admin .button.feng-media-icon--clear:hover{background:#fff0ef;border-color:#edb5b0;color:#b33e36;}
+.feng-admin .form-table .feng-field-checkbox>th,.feng-admin .form-table .feng-field-checkbox>td,.feng-admin .form-table tr:has(>td>label>input[type=checkbox])>th,.feng-admin .form-table tr:has(>td>label>input[type=checkbox])>td{vertical-align:middle;padding-top:20px;padding-bottom:20px;}
+.feng-admin .feng-field-checkbox .feng-field-control{min-height:24px;}
+.feng-admin .feng-field-checkbox .feng-field-control>label,.feng-admin .form-table td>label:has(>input[type=checkbox]){display:inline-flex;align-items:center;gap:8px;line-height:24px;margin:0;}
+.feng-admin .feng-field-checkbox input[type=checkbox],.feng-admin .form-table td>label>input[type=checkbox]{margin:0;flex-shrink:0;}
+@media(max-width:782px){.feng-admin .form-table .feng-field-checkbox>th{padding:17px 0 6px;}.feng-admin .form-table .feng-field-checkbox>td{padding:0 0 16px;}}
+
+.feng-music-links{width:100%;min-width:0;}.feng-music-links textarea{width:100%;font:12px/1.9 ui-monospace,SFMono-Regular,Consolas,monospace;overflow-wrap:anywhere;}.feng-music-links>p{width:100%;}
+
+.feng-admin-about{font-size:12px;color:#646970;max-width:640px;line-height:1.8;}.feng-admin-about summary{cursor:pointer;}.feng-admin-about p{font-size:12px;margin:8px 0;}

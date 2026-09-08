@@ -1,0 +1,56 @@
+/* Notification badge: only the badge moves, never its menu trigger. */
+.feng-feed-badge { --badge-slide-dur: 550ms; --badge-pop-dur: 750ms; --badge-pop-close-dur: 350ms; --badge-fade-dur: 650ms; --badge-fade-close-dur: 350ms; --badge-offset-x: -8.2px; --badge-offset-y: 12.4px; position: absolute; top: -7px; right: -9px; pointer-events: none; line-height: 1; }
+.feng-feed-badge[data-open="true"] { animation: feng-badge-slide var(--badge-slide-dur) cubic-bezier(.22,1,.36,1); }
+.feng-feed-badge .t-badge-dot { display: grid; place-items: center; min-width: 17px; height: 17px; padding: 0 4px; border-radius: 9px; background: var(--xf-accent); color:var(--xf-accent-text); font: 500 10px/1 system-ui,sans-serif; font-variant-numeric: tabular-nums; box-shadow: 0 2px 7px color-mix(in srgb,var(--xf-accent) 16%,transparent); transform-origin: center; opacity: 1; transform: scale(1); filter: blur(0); transition: transform var(--badge-pop-dur) cubic-bezier(.34,1.36,.64,1),opacity var(--badge-fade-dur),filter var(--badge-pop-dur); }
+.feng-feed-badge[data-open="false"] .t-badge-dot { transform: scale(0); opacity: 0; filter: blur(2px); transition-duration: var(--badge-pop-close-dur),var(--badge-fade-close-dur),var(--badge-pop-close-dur); }
+.xf-menu a:has(.feng-feed-badge) { position: relative; overflow: visible; }
+@keyframes feng-badge-slide { from { transform: translate(var(--badge-offset-x),var(--badge-offset-y)); } to { transform: translate(0,0); } }
+.feng-feed-overview { display: flex; flex-wrap: wrap; gap: 14px 24px; margin: 0 0 32px; font-size: 12px; color: var(--xf-muted); }
+.feng-feed-overview > span { display: inline-flex; gap: 7px; align-items: center; }
+.feng-feed-overview strong { font-weight: 500; color: var(--xf-text); }
+.feng-feed-overview svg { width: 16px; height: 16px; }
+.feng-feed-toolbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; padding-bottom: 18px; border-bottom: 1px solid var(--xf-line); }
+.feng-feed-tabs { display: flex; gap: 5px; }
+.feng-feed-tabs button { border: 0; border-radius: 14px; background: transparent; color: var(--xf-muted); padding: 9px 14px; font: inherit; font-size: 12px; cursor: pointer; transition: background .65s,color .65s; }
+.feng-feed-tabs button[aria-pressed="true"] { color: var(--xf-accent); background: color-mix(in srgb,var(--xf-accent) 8%,var(--xf-surface)); }
+.feng-feed-status { font-size: 11px; color: var(--xf-muted); margin: 16px 0 0; min-height: 18px; }
+.feng-feed-entries { transition: opacity .45s; }
+.feng-feed-entries[aria-busy="true"] { opacity: .55; }
+.feng-feed-entry { display: flex; gap: 16px; padding: 25px 0; border-bottom: 1px solid var(--xf-line); }
+.feng-feed-entry__mark { flex: 0 0 36px; height: 36px; border-radius: 12px; display: grid; place-items: center; background: color-mix(in srgb,var(--xf-accent) 6%,var(--xf-surface)); color: var(--xf-accent); font-size: 14px; }
+.feng-feed-entry__body { flex: 1; min-width: 0; }
+.feng-feed-entry__meta { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; color: var(--xf-muted); font-size: 11px; }
+.feng-feed-today { color: var(--xf-accent); font-size: 10px; }
+.feng-feed-entry h2 { margin: 8px 0 6px; font-size: 15px; line-height: 1.7; font-weight: 500; overflow-wrap: anywhere; }
+.feng-feed-entry h2 a { text-decoration: none; display: flex; align-items: baseline; justify-content: space-between; gap: 16px; transition: color .6s; }
+.feng-feed-entry h2 a:hover { color: var(--xf-accent); }
+.feng-feed-entry h2 svg { width: 16px; height: 16px; opacity: .4; transition: opacity .6s,transform .6s; }
+.feng-feed-entry h2 a:hover svg { opacity: 1; transform: scale(1.1); }
+.feng-feed-entry p { margin: 0; color: var(--xf-muted); font-size: 12px; line-height: 1.9; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
+.feng-feed-more { display: flex; align-items: center; gap: 8px; margin: 28px auto 0; padding: 10px 16px; border: 0; border-radius: 14px; font: inherit; font-size: 12px; background: color-mix(in srgb,var(--xf-accent) 6%,var(--xf-surface)); color: var(--xf-accent); cursor: pointer; }
+.feng-feed-more svg { width: 14px; height: 14px; }
+.feng-feed-empty { text-align: center; padding: 65px 12px; color: var(--xf-muted); }
+.feng-feed-empty > svg { width: 32px; height: 32px; color: var(--xf-accent); opacity: .65; }
+.feng-feed-empty h2 { font-size: 17px; font-weight: 400; margin: 18px 0 10px; color: var(--xf-text); }
+.feng-feed-empty p { font-size: 12px; }
+.feng-feed-empty a { display: inline-flex; align-items: center; gap: 5px; margin-top: 12px; color: var(--xf-accent); font-size: 12px; }
+.feng-feed-empty a svg { width: 14px; height: 14px; }
+.feng-feed-footer { margin-top: 35px; color: var(--xf-muted); font-size: 10px; line-height: 1.9; }
+.feng-feed-footer p { margin: 0; }
+.feng-subscriptions [hidden] { display: none !important; }
+@media(max-width:600px) { .feng-feed-toolbar { align-items: flex-start; } .feng-feed-entry { gap: 12px; } .feng-feed-entry h2 { font-size: 14px; } .feng-feed-overview { gap: 12px; } }
+@media(prefers-reduced-motion:reduce) { .feng-feed-badge,.feng-feed-badge .t-badge-dot { animation: none !important; transition: none !important; } .feng-subscriptions * { transition: none !important; } }
+
+.feng-feed-entry__mark{overflow:hidden;flex-shrink:0;}.feng-feed-entry__mark .feng-friend-avatar-img{display:block;width:100%;height:100%;object-fit:cover;border-radius:inherit;}.feng-feed-entry__mark [hidden]{display:none!important;}
+
+/* Keep subscription statistics beside the page title, wrapping below on small screens. */
+.feng-feed-hero { display:flex; align-items:center; justify-content:space-between; gap:24px; }
+.feng-feed-hero-copy > p:last-child { color:var(--xf-muted); font-size:13px; line-height:1.9; }
+.feng-feed-hero .feng-feed-overview { justify-content:flex-end; margin:0; gap:14px 24px; max-width:420px; }
+.feng-feed-hero .feng-feed-overview > span { white-space:nowrap; }
+.feng-feed-last-sync { flex-basis:100%; justify-content:flex-end; }
+@media(max-width:700px) {
+ .feng-feed-hero { align-items:flex-start; flex-direction:column; gap:20px; }
+ .feng-feed-hero .feng-feed-overview { justify-content:flex-start; max-width:none; }
+ .feng-feed-last-sync { justify-content:flex-start; }
+}

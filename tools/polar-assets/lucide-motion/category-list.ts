@@ -1,0 +1,51 @@
+const mounted=new Map<HTMLElement,()=>void>();
+function mount(){
+ for(const [el,clean] of mounted)if(!el.isConnected){clean();mounted.delete(el);}
+ document.querySelectorAll<HTMLElement>('[data-category-list]').forEach(card=>{
+  if(mounted.has(card))return;
+  const preview=card.querySelector<HTMLImageElement>('.feng-category-list__preview')!;
+  const base=card.querySelector<HTMLImageElement>('.feng-category-list__base')?.src;
+  const picture=card.querySelector<HTMLElement>('.feng-category-list__picture')!;
+  const controller=new AbortController();let version=0,timer:number|undefined;
+  const reset=()=>{version++;clearTimeout(timer);picture.classList.remove('is-loading');preview.classList.remove('is-visible');};
+  const show=(url:string)=>{
+   reset();if(!url||url===base)return;
+   picture.classList.add('is-loading');const current=version;const image=new Image();image.src=url;
+   image.decode().then(()=>{if(current!==version)return;timer=window.setTimeout(()=>{if(current!==version)return;picture.classList.remove('is-loading');preview.src=url;preview.hidden=false;requestAnimationFrame(()=>{if(current===version)preview.classList.add('is-visible');});},160);}).catch(()=>{if(current===version)picture.classList.remove('is-loading');});
+  };
+  card.querySelectorAll<HTMLElement>('[data-category-preview]').forEach(link=>{
+   link.addEventListener('pointerenter',e=>{if(e.pointerType!=='touch')show(link.dataset.categoryPreview||'');},{signal:controller.signal});
+   link.addEventListener('focus',()=>show(link.dataset.categoryPreview||''),{signal:controller.signal});
+  });
+  card.addEventListener('pointerleave',reset,{signal:controller.signal});
+  card.addEventListener('focusout',e=>{if(!card.contains(e.relatedTarget as Node))reset();},{signal:controller.signal});
+  mounted.set(card,()=>{reset();controller.abort();});
+ });
+}
+document.addEventListener('xf:mounted',mount);
+document.addEventListener('xf:before-unmount',()=>{mounted.forEach(clean=>clean());mounted.clear();});
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount,{once:true});else mount();
+
+document.addEventListener('click',event=>{
+ const button=(event.target as Element).closest<HTMLButtonElement>('[data-collection-tab]');
+ if(!button)return;
+ const hub=button.closest('.feng-article-hub');if(!hub)return;
+ const description=hub.querySelector<HTMLElement>('[data-hub-description]'),watermark=hub.querySelector<HTMLImageElement>('[data-hub-watermark]');
+ if(description)description.textContent=button.dataset.description||'';
+ if(watermark){watermark.hidden=!button.dataset.watermark;if(button.dataset.watermark)watermark.src=button.dataset.watermark;else watermark.removeAttribute('src');}
+
+ hub.querySelectorAll<HTMLElement>('[data-collection-tab]').forEach(tab=>tab.setAttribute('aria-pressed',String(tab===button)));
+ hub.querySelectorAll<HTMLElement>('[data-collection-panel]').forEach(panel=>{panel.hidden=panel.dataset.collectionPanel!==button.dataset.collectionTab;});
+});
+let hubRequest:AbortController|null=null;
+document.addEventListener('xf:before-unmount',()=>hubRequest?.abort());
+document.addEventListener('click',async event=>{
+ const button=(event.target as Element).closest<HTMLButtonElement>('[data-hub-type],[data-hub-page]');if(!button||button.disabled)return;
+ const panel=button.closest<HTMLElement>('[data-hub-endpoint]');if(!panel)return;
+ hubRequest?.abort();const controller=new AbortController();hubRequest=controller;
+ const url=new URL(panel.dataset.hubEndpoint!,location.href);url.searchParams.set('action','feng_hub');url.searchParams.set('category',panel.dataset.hubCategory||'0');url.searchParams.set('type',button.dataset.hubType||button.dataset.hubSort||'latest');url.searchParams.set('page',button.dataset.hubPage||'1');
+ panel.setAttribute('aria-busy','true');const timer=setTimeout(()=>controller.abort(),12000);
+ try{const response=await fetch(url,{signal:controller.signal});const data=await response.json();if(!response.ok||!data.success)throw new Error();if(controller.signal.aborted||!panel.isConnected)return;panel.innerHTML=data.data.html;mount();panel.querySelector<HTMLElement>('[aria-pressed="true"]')?.focus({preventScroll:true});}
+ catch{if(!controller.signal.aborted)(window as any).fengToast?.('加载失败，请重试','error');}
+ finally{clearTimeout(timer);if(hubRequest===controller){panel.removeAttribute('aria-busy');hubRequest=null;}}
+});

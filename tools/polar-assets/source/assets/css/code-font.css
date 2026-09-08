@@ -1,0 +1,8 @@
+@font-face{font-family:"Ioskeley Mono";src:url("../fonts/ioskeley-mono/IoskeleyMono-Regular.woff2") format("woff2");font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:"Ioskeley Mono";src:url("../fonts/ioskeley-mono/IoskeleyMono-Italic.woff2") format("woff2");font-weight:400;font-style:italic;font-display:swap}
+@font-face{font-family:"Ioskeley Mono";src:url("../fonts/ioskeley-mono/IoskeleyMono-Bold.woff2") format("woff2");font-weight:700;font-style:normal;font-display:swap}
+@font-face{font-family:"Ioskeley Mono";src:url("../fonts/ioskeley-mono/IoskeleyMono-BoldItalic.woff2") format("woff2");font-weight:700;font-style:italic;font-display:swap}
+:root{--feng-code-font:"Ioskeley Mono",ui-monospace,SFMono-Regular,Consolas,"PingFang SC","Microsoft YaHei",monospace;}
+.xf-prose pre,.xf-prose pre code,.xf-prose :not(pre)>code,.xf-prose kbd,.xf-prose samp{font-family:var(--feng-code-font);}
+
+code,pre,kbd,samp{font-family:var(--feng-code-font);}

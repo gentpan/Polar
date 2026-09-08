@@ -1,0 +1,6 @@
+.editor-styles-wrapper { font-family: var(--xf-font); line-height: 2; color: var(--xf-text); background: var(--xf-bg); }
+.editor-styles-wrapper .wp-block { max-width: var(--xf-reading); }
+.editor-styles-wrapper .wp-block[data-align="wide"] { max-width: var(--xf-width); }
+.editor-styles-wrapper .wp-block[data-align="full"] { max-width: none; }
+.editor-styles-wrapper img { max-width: 100%; height: auto; border-radius: var(--xf-radius-small); }
+.editor-styles-wrapper pre { overflow-x: auto; padding: 24px; background: var(--xf-soft); border-radius: var(--xf-radius-small); }

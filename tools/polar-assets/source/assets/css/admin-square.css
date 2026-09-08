@@ -1,0 +1,11 @@
+/* Native square admin surfaces; loaded only in wp-admin. */
+body.wp-admin #wpcontent :is(.button,button,input:not([type=radio]):not([type=range]),select,textarea,.postbox,.stuffbox,.notice,.card,.nav-tab,.search-box,.wp-list-table),
+body.wp-admin :is(.media-modal-content,.media-frame input:not([type=radio]),.media-frame select,.media-frame textarea,.media-frame .button),
+body.wp-admin .feng-admin,body.wp-admin .feng-admin *,
+body.wp-admin :is(#feng-ai-editor,#feng-travel) *{border-radius:0!important;corner-shape:round!important;}
+body.wp-admin .feng-admin-emblem,body.wp-admin .feng-admin-emblem .dashicons{transform:none;}
+body.wp-admin .feng-admin .button.feng-media-icon{display:inline-flex;align-items:center;justify-content:center;padding:0;line-height:1;}
+body.wp-admin .feng-admin .feng-media-icon .dashicons{display:flex;align-items:center;justify-content:center;width:18px;height:18px;margin:0;padding:0;font-size:18px;line-height:18px;flex:0 0 18px;}
+body.wp-admin .feng-admin .feng-media-icon .dashicons::before{display:block;line-height:18px;width:18px;height:18px;margin:0;padding:0;}
+body.wp-admin .feng-admin-tabs .dashicons,body.wp-admin .feng-admin-tabs .dashicons::before{line-height:18px;}
+body.wp-admin .feng-admin-emblem .dashicons,body.wp-admin .feng-admin-emblem .dashicons::before{line-height:22px;}

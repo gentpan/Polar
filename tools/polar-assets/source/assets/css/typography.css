@@ -1,0 +1,63 @@
+/* Brand and navigation can be switched independently without changing body typography. */
+:root {
+ --feng-brand-font: "Alimama FangYuanTi VF", var(--xf-font);
+ --feng-menu-font: "Space Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+ --feng-hero-font: "FontQu Smile 常规", var(--xf-font);
+ --feng-reading-font: "Space Grotesk", "Misans VF", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+.xf-brand__title, .xf-footer__name { font-family: var(--feng-brand-font); font-weight: 400; }
+
+.xf-header .xf-menu a { font-family: var(--feng-menu-font); font-weight: 400; }
+.single-post .xf-reading-cover__copy h1, .single-post .feng-entry-hero__copy h1 { font-family: "快看世界体", var(--xf-font); font-weight: 400; }
+.xf-stage__identity h1 { font-family: var(--feng-hero-font); font-weight: 400; }
+.single-post .xf-article, .single-post .xf-main > .xf-reading { font-family: var(--feng-reading-font); -webkit-font-smoothing: antialiased; }
+.single-post .xf-prose { font-size: 16px; font-weight: 400; line-height: 2; letter-spacing: normal; }
+.single-post .xf-prose :is(h1,h2,h3,h4,h5,h6) { font-weight: 600; line-height: 1.5; letter-spacing: normal; }
+.single-post .xf-prose h1 { font-size: 32px; }
+.single-post .xf-prose h2 { font-size: 24px; }
+.single-post .xf-prose h3 { font-size: 20px; }
+.single-post .xf-prose h4 { font-size: 18px; }
+.single-post .xf-prose h5 { font-size: 16px; }
+.single-post .xf-prose h6 { font-size: 14px; }
+.single-post .xf-reading-cover__copy h1, .single-post .feng-entry-hero__copy h1 { letter-spacing: normal; }
+
+/* Shared Font Awesome glyph boxes preserve control alignment. */
+.feng-fa{display:inline-flex;align-items:center;justify-content:center;width:1em!important;height:1em!important;flex:0 0 auto;line-height:1!important;vertical-align:middle;font-style:normal;}
+.feng-fa::before{line-height:1;}.feng-fa[style*="display:none"]{display:none!important;}
+.feng-fa-dice{display:inline-grid;place-items:center;width:18px;height:18px;}.feng-fa-dice>i{grid-area:1/1;}
+.xf-icon-button>.feng-fa,.xf-top>.feng-fa,.t-icon>.feng-fa{font-size:18px;}
+.feng-social .feng-fa{font-size:16px;}.feng-hero-note small>.feng-fa{font-size:14px;}
+.feng-card-corners .feng-fa,.feng-cover-card__meta .feng-fa{font-size:12px;}
+.feng-collection-controls .feng-fa{font-size:15px;}.feng-collection-hint .feng-fa{font-size:12px;}
+.feng-music .feng-fa{font-size:16px;}.feng-reading-tools .feng-fa{font-size:17px;}
+.feng-dashboard-section-head .feng-fa{font-size:18px;}
+
+.feng-fa-dice>i{font-size:18px;}.feng-fa[hidden]{display:none!important;}
+/* Dice faces share one centered cell instead of inheriting the button text baseline. */
+.xf-icon-button>.feng-fa-dice{display:grid;place-items:center;line-height:1;font-size:18px;vertical-align:middle;}
+.xf-icon-button>.feng-fa-dice>.feng-fa{display:flex;align-items:center;justify-content:center;grid-area:1/1;margin:0;vertical-align:middle;}
+.xf-header .xf-tools{align-items:center;}
+/* Center the dice glyph itself, independent of inherited Font Awesome line boxes. */
+.xf-header .feng-random-article{position:relative;line-height:1;}
+.xf-header .feng-random-article>.feng-fa-dice{position:absolute;left:50%;top:50%;translate:-50% -50%;width:18px;height:18px;display:block;}
+.xf-header .feng-random-article [data-dice-face]{position:absolute;inset:0;width:18px!important;height:18px!important;font-size:18px;line-height:18px!important;}
+.xf-header .feng-random-article [data-dice-face]::before{position:absolute;left:50%;top:50%;translate:-50% -50%;display:block;line-height:1;width:auto;margin:0;}
+/* Icon-only links must not inherit the browser's text underline. */
+.xf-tools a.xf-icon-button,.xf-tools a.xf-icon-button:is(:hover,:focus-visible),.feng-social a,.feng-social a:is(:hover,:focus-visible){text-decoration:none;}
+/* Icon controls respond with a small scale change, without a hover background. */
+.xf-icon-button:is(:hover,:focus-visible),:root:not([data-xf-scrolled]) .xf-header .xf-icon-button:is(:hover,:focus-visible){background:transparent;transform:scale(1.1);}
+.feng-social a,.xf-footer .feng-social a{transition:transform .25s ease,color .25s ease;}
+.feng-social a:is(:hover,:focus-visible),.xf-footer .feng-social a:is(:hover,:focus-visible){background:transparent;transform:scale(1.1);}
+.xf-footer .feng-social a:hover svg{transform:none;}
+@media(prefers-reduced-motion:reduce){.feng-social a,.xf-footer .feng-social a{transition:none;}}
+
+.xf-header .xf-icon-button:is(:hover,:focus-visible),.feng-social a:is(:hover,:focus-visible),.xf-footer .feng-social a:is(:hover,:focus-visible){color:var(--xf-accent);}
+.xf-footer .feng-social a.is-copied,.xf-footer .feng-social a.is-copied:hover{color:#35a36c;}
+.feng-toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));translate:-50% 0;z-index:10050;display:flex;align-items:center;gap:10px;max-width:min(460px,calc(100vw - 32px));box-sizing:border-box;padding:12px 20px;border:1px solid var(--xf-line);border-radius:18px;background:var(--xf-surface);color:var(--xf-text);box-shadow:0 8px 32px rgb(0 0 0 / .14);font-size:13px;line-height:1.6;pointer-events:none;animation:feng-toast-in .25s ease-out;}
+.feng-toast[hidden]{display:none;}.feng-toast>i{color:#35a36c;}.feng-toast[data-type=error]>i{color:#e66a64;}
+@keyframes feng-toast-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.feng-toast{animation:none;}}
+@media print{.feng-toast{display:none;}}
+
+/* Header controls use one consistent 18px icon size, including system mode. */
+.xf-header .xf-tools .xf-icon-button{display:inline-flex;align-items:center;justify-content:center;line-height:1;}.xf-header .xf-tools .xf-icon-button :is(.feng-fa,.feng-scheme-system){font-size:18px;line-height:1;width:18px!important;height:18px!important;text-align:center;}.xf-header .xf-tools .feng-scheme-system::before{line-height:18px;}.xf-header .feng-random-article [data-dice-default]{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}.xf-header .feng-random-article [data-dice-default][style*="display: none"]{display:none!important;}

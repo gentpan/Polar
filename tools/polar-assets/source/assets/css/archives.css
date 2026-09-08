@@ -1,0 +1,42 @@
+/* Archive layout is independent of the profile and friends page grids. */
+.feng-archive-page { padding: 38px 28px; background: var(--feng-paper); color: var(--feng-ink); backdrop-filter: none; -webkit-backdrop-filter: none; }
+.feng-archive-layout { display: grid; grid-template-columns: 150px minmax(0,1fr); gap: 30px; align-items: start; }
+.feng-archive-sidebar { position: sticky; top: 116px; padding-top: 10px; }
+.feng-archive-heading h1 { margin: 10px 0 9px; font-size: 26px; font-weight: 550; letter-spacing: 0; }
+.feng-archive-heading h1 > span { color: var(--xf-accent); }
+.feng-archive-heading p { margin: 0 0 12px; font-size: 11px; line-height: 1.9; color: var(--xf-muted); }
+.feng-archive-heading .xf-section-kicker { font-size: 8px; letter-spacing: .1em; }
+.feng-archive-heading .feng-archive-total { margin-bottom: 23px; font-size: 10px; }
+.feng-archive-page .feng-years { display: grid; gap: 5px; overflow: visible; }
+.feng-archive-page .feng-years a { padding: 7px 10px; font-size: 11px; border-radius: 10px; gap: 10px; }
+.feng-archive-page .feng-years a span { font-size: 10px; }
+.feng-archive-page .feng-years a[aria-current] { color: var(--xf-accent); background: color-mix(in srgb,var(--xf-accent) 8%,var(--feng-paper)); }
+.feng-archive-body { min-width: 0; }
+.feng-archive-months { columns: 2; column-gap: 20px; }
+.feng-archive-page .feng-month { position: relative; isolation: isolate; display: inline-block; vertical-align: top; width: 100%; margin: 0 0 22px; padding: 0; border: 0; border-radius: 0; background: none; break-inside: avoid; }
+.feng-archive-page .feng-month h2 { position: relative; z-index: 0; display: block; margin: 0 0 -12px; padding-left: 9px; font: italic 600 clamp(27px,2.6vw,34px)/1.2 var(--feng-reading-font); letter-spacing: -.02em; color: var(--xf-muted); white-space: nowrap; }
+@supports (-webkit-text-stroke: 1px black) {
+ .feng-archive-page .feng-month h2 { color: transparent; -webkit-text-stroke: 1px color-mix(in srgb,var(--xf-muted) 40%,transparent); }
+}
+.feng-archive-page .feng-month ol { position: relative; z-index: 1; padding: 9px 13px; border-radius: 14px; background: var(--xf-surface); box-shadow: 0 4px 18px rgb(20 25 40 / .035); }
+.feng-archive-page .feng-month li + li { border: 0; }
+.feng-archive-page .feng-month li a { grid-template-columns: 28px minmax(0,1fr); gap: 8px; padding: 8px 0; font-size: 12px; line-height: 1.7; align-items: baseline; }
+.feng-archive-page .feng-month li a > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.feng-archive-page .feng-month time { font-size: 10px; color: var(--xf-accent); opacity: .7; }
+.feng-archive-page .feng-pagination { margin-top: 6px; }
+@media (max-width: 1000px) {
+ .feng-archive-layout { grid-template-columns: minmax(0,1fr); gap: 24px; }
+ .feng-archive-sidebar { position: static; padding-top: 0; }
+ .feng-archive-page .feng-years { display: flex; flex-wrap: wrap; gap: 7px; }
+ .feng-archive-page .feng-years a { flex: 0 0 auto; }
+ .feng-archive-heading .feng-archive-total { margin-bottom: 14px; }
+}
+@media (max-width: 700px) {
+ .feng-archive-page { padding: 26px 18px; }
+ .feng-archive-months { columns: 1; }
+ .feng-archive-page .feng-month { margin-bottom: 22px; }
+ .feng-archive-page .feng-month h2 { font-size: 30px; }
+ .feng-archive-page .feng-month li a > span { white-space: normal; overflow-wrap: anywhere; }
+}
+
+.feng-archive-site-stats{display:flex;flex-wrap:wrap;gap:8px 16px;margin-top:14px;color:var(--xf-muted);font-size:12px;line-height:1.8;}.feng-archive-site-stats>span{display:inline-flex;align-items:center;gap:6px;}.feng-archive-site-stats .feng-icon{font-size:13px;}

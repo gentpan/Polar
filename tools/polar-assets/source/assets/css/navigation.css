@@ -1,0 +1,144 @@
+/* Native menu layout and pointer popover; illumination comes from the shared glider. */
+.xf-header .xf-menu > li > a { position: relative; isolation: isolate; background: transparent !important; transition: color .55s; }
+.xf-header .xf-menu > .feng-nav-parent { display: flex; align-items: center; }
+.xf-header .xf-menu > .feng-nav-parent > a { padding-right: 3px; }
+.feng-nav-toggle { display: grid; place-items: center; width: 18px; height: 28px; border: 0; padding: 2px; background: transparent; color: var(--xf-muted); cursor: pointer; }
+.feng-nav-toggle svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.6; transition: transform .6s var(--feng-motion-gentle); }
+[data-feng-nav-open] > .feng-nav-toggle svg { transform: rotate(180deg); }
+.feng-nav-toggle:focus-visible { outline: 2px solid var(--xf-accent); outline-offset: 2px; border-radius: 6px; }
+.feng-nav-popover { --feng-nav-line: color-mix(in srgb,var(--xf-accent) 14%,var(--xf-surface)); position: absolute; top: calc(100% + 16px); left: 0; width: min(220px,calc(100vw - 32px)); padding: 12px; border: 1px solid var(--feng-nav-line); border-radius: 22px; background: var(--xf-surface); color: var(--xf-text); box-shadow: 0 14px 38px rgb(20 25 45 / .09),0 2px 5px rgb(20 25 45 / .035); text-shadow: none; opacity: 0; visibility: hidden; pointer-events: none; transform: translateY(9px) scale(.97); transform-origin: var(--feng-nav-origin,50%) top; transition: opacity .5s,transform .65s var(--feng-motion-gentle),visibility 0s .65s; z-index: 40; }
+.feng-nav-popover::before { content: ""; position: absolute; left: 0; right: 0; top: -20px; height: 22px; }
+[data-feng-nav-open] > .feng-nav-popover { opacity: 1; visibility: visible; pointer-events: auto; transform: none; transition-delay: 0s; }
+.feng-nav-pointer { position: absolute; top: -13px; left: var(--feng-nav-arrow,32px); width: 28px; height: 14px; overflow: visible; fill: var(--xf-surface); stroke: var(--feng-nav-line); stroke-width: 1; pointer-events: none; }
+.xf-header .feng-nav-popover > .sub-menu { position: static; display: grid; gap: 3px; min-width: 0; padding: 0; margin: 0; border: 0; border-radius: 0; box-shadow: none; background: transparent; }
+.xf-header .feng-nav-popover .sub-menu a { padding: 9px 12px; border-radius: 12px; font-size: 12px; font-weight: 400; line-height: 1.7; transition: background .45s,color .45s; }
+.xf-header .feng-nav-popover .sub-menu a:is(:hover,:focus-visible) { color: var(--xf-accent); background: color-mix(in srgb,var(--xf-accent) 6%,var(--xf-surface)); }
+.xf-header .feng-nav-popover .sub-menu .sub-menu { position: static; display: block; padding: 0 0 4px 10px; margin: 0; border: 0; border-radius: 0; min-width: 0; box-shadow: none; background: transparent; }
+.feng-nav-popover[data-columns="2"] { width: min(400px,calc(100vw - 32px)); }
+.xf-header .feng-nav-popover[data-columns="2"] > .sub-menu { grid-template-columns: repeat(2,minmax(0,1fr)); }
+@media(max-width:480px) { .feng-nav-popover[data-columns="2"] { width: min(280px,calc(100vw - 32px)); } .xf-header .feng-nav-popover[data-columns="2"] > .sub-menu { grid-template-columns: 1fr; } }
+@media(prefers-reduced-motion:reduce) { .feng-nav-popover,.feng-nav-toggle svg,.xf-header .xf-menu > li > a::before,.xf-header .xf-menu > li > a::after { transition: none; } }
+
+/* Random reading rolls only the die; the surrounding toolbar stays stationary. */
+.feng-random-article[aria-busy=true] .feng-icon{animation:feng-dice-roll .38s ease-in-out infinite;}
+.feng-random-article[aria-busy=true]{cursor:progress;}
+@keyframes feng-dice-roll{0%,100%{transform:rotate(-14deg) translateY(0) scale(1)}30%{transform:rotate(18deg) translateY(-3px) scale(1.08)}65%{transform:rotate(-9deg) translateY(-1px) scale(.96)}}
+@media(prefers-reduced-motion:reduce){.feng-random-article[aria-busy=true] .feng-icon{animation:none;opacity:.6;}}
+@media(max-width:700px){
+ .xf-header{grid-template-columns:minmax(0,1fr) auto;}
+ .xf-header .xf-tools{gap:3px;}
+ .xf-header .xf-brand{min-width:0;max-width:100%;}
+ .xf-header .xf-brand__title{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+}
+
+/* Let the header settle gently, including when PJAX returns the page to the top. */
+.xf-header{transition:width .95s cubic-bezier(.22,1,.36,1),top .95s cubic-bezier(.22,1,.36,1),padding .95s cubic-bezier(.22,1,.36,1),border-radius .95s cubic-bezier(.22,1,.36,1),color .6s;}
+.xf-header::before{transition:opacity .95s cubic-bezier(.22,1,.36,1);}
+@media(min-width:701px){:root[data-xf-scrolled] .xf-header{width:min(calc(var(--xf-frame) - 48px),calc(100% - 56px));padding-inline:20px;}}
+@media(prefers-reduced-motion:reduce){.xf-header,.xf-header::before{transition:none;}}
+/* Horizontal interpretation of Smit-Prajapati's Uiverse glider. */
+.xf-header .xf-nav{position:relative;isolation:isolate;}
+.feng-menu-glider{position:absolute;left:0;top:0;pointer-events:none;z-index:0;opacity:0;background:transparent;border-radius:0;transition:opacity .25s;}
+.feng-menu-glider.is-ready{transition:transform .5s cubic-bezier(.37,1.45,.66,1),width .4s ease,height .4s ease,opacity .25s;}
+.feng-menu-glider::before{content:"";position:absolute;bottom:0;left:12%;width:76%;height:2px;background:linear-gradient(90deg,transparent,var(--xf-accent) 50%,transparent);}
+.feng-menu-glider::after{content:"";position:absolute;bottom:1px;left:5%;width:90%;height:24px;background:radial-gradient(ellipse at 50% 100%,color-mix(in srgb,var(--xf-accent) 26%,transparent),transparent 72%);filter:blur(3px);opacity:1;}
+.xf-header .xf-nav>.xf-menu,.xf-header .xf-nav>div>.xf-menu{position:relative;z-index:1;}
+.xf-header .xf-menu>li>a,:root:not([data-xf-scrolled]) .xf-header .xf-menu>li>a:is(:hover,.is-glider-active),.xf-header .xf-menu>.current-menu-item>a{background:transparent;}
+.xf-header .xf-menu>li>a{transition:color .3s ease;}
+.xf-header .xf-menu>li>a.is-glider-active,:root:not([data-xf-scrolled]) .xf-header .xf-menu>li>a.is-glider-active{color:var(--xf-accent);}
+@media(prefers-reduced-motion:reduce){.feng-menu-glider.is-ready{transition:none;}}
+
+.xf-header .xf-tools{gap:0;}
+
+/* SVG paths morph internally; the clickable frame stays still. */
+
+.xf-header .has-lucide-animation:is(:hover,:focus-visible),.xf-header [data-feng-copy-rss].is-copied{color:var(--xf-accent);}
+
+/* Three translucent waves behind RSS, coloured by the active theme. */
+.xf-header [data-feng-copy-rss]{isolation:isolate;}
+
+
+
+
+
+
+
+/* Lucide Animated replaces the former path morph driver. */
+.xf-header .xf-tools .has-lucide-animation>:not(.feng-lucide-animation){display:none!important;}
+.xf-header .has-lucide-animation,.xf-header .has-lucide-animation:is(:hover,:focus-visible){transform:none;}
+.xf-header .feng-lucide-animation{display:block;width:20px;height:20px;pointer-events:none;}
+.feng-lucide-animation>div{width:20px;height:20px;}
+.feng-lucide-animation svg{display:block;overflow:visible;width:20px;height:20px;}
+.xf-header .has-lucide-animation:is(:hover,:focus-visible){color:var(--xf-accent);}
+@media(prefers-reduced-motion:no-preference){
+ .feng-lucide-animation [data-supplement="system"][data-playing="true"] rect{animation:feng-lucide-screen .65s ease both;}
+}
+
+@keyframes feng-lucide-screen{0%,100%{fill:transparent}50%{fill:color-mix(in srgb,currentColor 18%,transparent)}}
+
+/* Single-color Lordicon inherits the header color in both schemes. */
+
+
+
+
+
+
+
+
+
+/* Authored Lordicon animations for statistics and category badges. */
+.feng-lordicon-content{display:none;width:1em;height:1em;flex:0 0 1em;vertical-align:middle;pointer-events:none;}
+.has-lordicon-content>.feng-lordicon-content{display:inline-block;}
+.has-lordicon-content>i{display:none!important;}
+.feng-lordicon-content svg,.feng-lordicon-check svg{display:block;width:100%;height:100%;}
+.feng-lordicon-content svg path[fill],.feng-lordicon-check svg path[fill]{fill:currentColor;}
+.feng-category-badge>.feng-lordicon-content{width:100%;height:100%;}
+
+.xf-copy{display:inline-flex;align-items:center;gap:5px;}
+.feng-icon[data-lordicon-content]{display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em;vertical-align:-.12em;}
+.xf-top>.feng-lordicon-content{width:36px;height:36px;}
+.feng-related-refresh>.feng-lordicon-content{width:18px;height:18px;flex-basis:18px;}
+.feng-related-refresh.has-lordicon-content.is-refreshing svg{animation:none;}
+.xf-header [data-feng-copy-rss].is-copied{color:var(--xf-accent);}
+.comment-reply-link>.feng-lordicon-content{width:16px;height:16px;flex-basis:16px;}
+
+.feng-lordicon-cog svg path[fill],.feng-lordicon-magnifier svg path[fill],.feng-lordicon-rss svg path[fill],.feng-lordicon-random svg path[fill]{fill:currentColor;}
+
+.feng-brand-animation svg path[fill="none"]{fill:none}
+.feng-brand-animation svg [stroke]:not([stroke="none"]){stroke:currentColor}
+
+/* Theme transition adapted from Uiverse.io by santosh-sarkar. */
+.feng-theme-orbit{display:grid;width:20px;height:20px;place-items:center;line-height:1;}
+.feng-lucide-animation .feng-theme-orbit svg{grid-area:1/1;transition:transform 500ms;transform-origin:center;}
+.feng-lucide-animation .feng-theme-orbit__moon{width:17px;height:17px;color:inherit;transition-delay:200ms;}
+.feng-lucide-animation .feng-theme-orbit__sun{width:20px;height:20px;stroke-width:2.3;color:inherit;transform:scale(0);}
+.feng-theme-orbit[data-light="true"] .feng-theme-orbit__moon{transform:rotate(360deg) scale(0);transition-delay:0ms;}
+.feng-theme-orbit[data-light="true"] .feng-theme-orbit__sun{transform:scale(1) rotate(360deg);transition-delay:200ms;}
+@media(prefers-reduced-motion:reduce){.feng-lucide-animation .feng-theme-orbit svg{transition:none;}}
+
+/* Click-driven menu morph, inspired by Uiverse.io / Ali-Tahmazi99. */
+.feng-panel-morph path{stroke-width:2.4;transform-origin:12px 12px;transition:transform 300ms ease,opacity 300ms ease;}
+.feng-panel-morph__top{transform-origin:12px 6px!important;}
+.feng-panel-morph__bottom{transform-origin:12px 18px!important;}
+.feng-panel-morph[data-open="true"] .feng-panel-morph__top{transform:translateY(6px) rotate(45deg);}
+.feng-panel-morph[data-open="true"] .feng-panel-morph__middle{transform:translateX(-10px);opacity:0;}
+.feng-panel-morph[data-open="true"] .feng-panel-morph__bottom{transform:translateY(-6px) rotate(-45deg);}
+@media(prefers-reduced-motion:reduce){.feng-panel-morph path{transition:none;}}
+
+.xf-header .feng-header-fa{display:grid;place-items:center;width:20px;height:20px;font-size:18px;line-height:1;color:inherit;transition:color 220ms ease,transform 220ms ease;}
+.xf-header :is([data-xf-search-open],[data-feng-random]){transition:color 220ms ease;}
+.xf-header :is([data-xf-search-open],[data-feng-random]):is(:hover,:focus-visible) .feng-header-fa{transform:scale(1.08);}
+@media(prefers-reduced-motion:reduce){.xf-header .feng-header-fa{transition:none;}.xf-header :is([data-xf-search-open],[data-feng-random]):is(:hover,:focus-visible) .feng-header-fa{transform:none;}}
+
+.feng-random-spinner{color:var(--xf-accent);}
+.feng-random-spinner g{transform-origin:12px 12px;animation:feng-random-rotate 2s linear infinite;}
+.feng-random-spinner circle{animation:feng-random-dash 1.5s cubic-bezier(.42,0,.58,1) infinite;}
+@keyframes feng-random-rotate{to{transform:rotate(360deg);}}
+@keyframes feng-random-dash{0%{stroke-dasharray:0 150;stroke-dashoffset:0;}47.5%{stroke-dasharray:42 150;stroke-dashoffset:-16;}95%,100%{stroke-dasharray:42 150;stroke-dashoffset:-59;}}
+@media(prefers-reduced-motion:reduce){.feng-random-spinner g,.feng-random-spinner circle{animation:none;}.feng-random-spinner circle{stroke-dasharray:42 150;}}
+
+/* Optical sizing: font glyphs are dense, while exported RSS has internal padding. */
+.xf-header .feng-lucide-animation{display:grid;place-items:center;}
+.xf-header .feng-panel-morph{width:23px;height:23px;}
+.xf-header .feng-lordicon-rss{width:23px!important;height:23px!important;}
+.xf-header .feng-lordicon-rss svg{width:100%;height:100%;}
