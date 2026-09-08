@@ -1,6 +1,15 @@
 <p align="center"><img src="assets/images/brand/polar-icon.png" width="96" alt="Polar 极地"></p>
 <h1 align="center">Polar · 极地</h1>
 <p align="center">记录生活，自有光芒。</p>
+<p align="center">
+  <a href="https://github.com/gentpan/Polar/blob/main/style.css"><img src="https://img.shields.io/badge/Polar-0.5.2-0755e9?style=flat-square" alt="Polar 0.5.2"></a>
+  <a href="https://wordpress.org/"><img src="https://img.shields.io/badge/WordPress-6.6%2B-21759B?style=flat-square&amp;logo=wordpress&amp;logoColor=white" alt="WordPress 6.6+"></a>
+  <a href="https://www.php.net/"><img src="https://img.shields.io/badge/PHP-7.4%2B-777BB4?style=flat-square&amp;logo=php&amp;logoColor=white" alt="PHP 7.4+"></a>
+  <a href="https://www.gnu.org/licenses/old-licenses/gpl-2.0.html"><img src="https://img.shields.io/badge/License-GPL--2.0--or--later-3b805a?style=flat-square" alt="License GPL-2.0-or-later"></a>
+  <a href="https://xifeng.net"><img src="https://img.shields.io/badge/Website-xifeng.net-0755e9?style=flat-square" alt="Website xifeng.net"></a>
+  <a href="https://github.com/gentpan/Polar/stargazers"><img src="https://img.shields.io/github/stars/gentpan/Polar?style=flat-square&amp;logo=github" alt="GitHub stars"></a>
+</p>
+
 <p align="center"><a href="https://xifeng.net">作者网站 · xifeng.net</a> · <a href="docs/README.md">使用文档</a></p>
 
 极地是一款面向个人博客的 WordPress 主题，以清晰的内容层级、蓝色点缀和深浅配色，呈现文章、说说、旅行足迹与朋友之间的互动。
