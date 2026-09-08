@@ -4,3 +4,7 @@ node_modules/
 .env.*
 *.log
 __pycache__/
+
+# Local maintenance notes (not runtime inputs)
+/docs/
+/ai/

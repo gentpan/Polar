@@ -10,7 +10,7 @@
   <a href="https://github.com/gentpan/Polar/stargazers"><img src="https://img.shields.io/github/stars/gentpan/Polar?style=flat-square&amp;logo=github" alt="GitHub stars"></a>
 </p>
 
-<p align="center"><a href="https://xifeng.net">作者网站 · xifeng.net</a> · <a href="docs/README.md">使用文档</a></p>
+<p align="center"><a href="https://xifeng.net">作者网站 · xifeng.net</a></p>
 
 极地是一款面向个人博客的 WordPress 主题，以清晰的内容层级、蓝色点缀和深浅配色，呈现文章、说说、旅行足迹与朋友之间的互动。
 
@@ -64,8 +64,6 @@ polar/
 ├── inc/             PHP 功能模块
 ├── pages/           自定义页面模板
 ├── template-parts/  可复用页面片段
-├── ai/              AI 目录说明
-├── docs/            功能文档
 ├── style.css        WordPress 主题元数据
 └── screenshot.png   WordPress 后台主题预览
 ```
@@ -81,3 +79,7 @@ python3 tools/polar-assets/audit.py
 ## 作者与许可
 
 由 [西风](https://xifeng.net) 设计与开发。主题 style.css 声明 GPL-2.0-or-later；第三方字体、图标、动画和其他资源遵循各自许可证，相关说明保留于资源目录。主题预览与品牌图标由 AI 辅助生成。
+
+## 仓库范围
+
+仓库保留主题代码、构建源码、README、AGENTS.md 和第三方资源许可。内部 docs、AI 维护说明、本地 WordPress 数据库、上传文件、密钥、运行缓存及 node_modules 不同步。当前运行时 AI 提示词仍在 PHP 模块中。

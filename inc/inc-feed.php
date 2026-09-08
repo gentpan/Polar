@@ -1,4 +1,54 @@
 <?php
+/** friend-avatar */
+/** Match approved commenters to friend domains; retain hashes, never copy email addresses. */
+if(!defined('ABSPATH'))exit;
+function feng_friend_domain($url){
+ $url=trim((string)$url);if(!$url)return '';if(!preg_match('~^https?://~i',$url))$url='https://'.$url;
+ $p=wp_parse_url($url);if(!$p||isset($p['user'])||isset($p['pass'])||empty($p['host']))return '';
+ $host=strtolower(rtrim($p['host'],'.'));if(function_exists('idn_to_ascii'))$host=idn_to_ascii($host,0,INTL_IDNA_VARIANT_UTS46)?:$host;
+ return preg_replace('/^www\./','',$host);
+}
+function feng_friend_avatar_rebuild(){
+ global $wpdb;$old=get_option('feng_friend_avatars',array());$map=array();$domains=array();
+ foreach(get_bookmarks(array('hide_invisible'=>false)) as $link){$domain=feng_friend_domain($link->link_url);if(!$domain)continue;$id=(int)$link->link_id;$prior=$old[$id]??array();$map[$id]=array('domain'=>$domain,'manual'=>($prior['domain']??'')===$domain?($prior['manual']??''):'','hash'=>'','comment'=>0);$domains[$domain][]=$id;}
+ if($domains){
+  $rows=$wpdb->get_results("SELECT comment_ID,comment_author_email,comment_author_url FROM {$wpdb->comments} WHERE comment_approved='1' AND comment_type IN ('','comment') AND comment_author_email<>'' AND comment_author_url<>'' ORDER BY comment_date_gmt DESC,comment_ID DESC");
+  foreach($rows as $c){$domain=feng_friend_domain($c->comment_author_url);if(empty($domains[$domain])||!is_email($c->comment_author_email))continue;
+   foreach($domains[$domain] as $id)if(!$map[$id]['hash']){$map[$id]['hash']=md5(strtolower(trim($c->comment_author_email)));$map[$id]['comment']=(int)$c->comment_ID;}
+  }
+ }
+ update_option('feng_friend_avatars',$map,false);update_option('feng_friend_avatar_version','1',false);
+}
+add_action('init',function(){if(get_option('feng_friend_avatar_version')!=='1')feng_friend_avatar_rebuild();},45);
+foreach(array('comment_post','transition_comment_status','edit_comment','deleted_comment','add_link','edit_link','deleted_link') as $hook)add_action($hook,'feng_friend_avatar_rebuild',50,0);
+function feng_friend_avatar($friend,$size=48){
+ if(is_numeric($friend))$friend=get_bookmark((int)$friend);if(!$friend)return '';
+ $domain=feng_friend_domain($friend->link_url);$all=get_option('feng_friend_avatars',array());$v=$all[(int)$friend->link_id]??array();
+ $hash=($v['domain']??'')===$domain?(($v['manual']??'')?:($v['hash']??'')):'';
+ $fallback='https://favicon.la/'.rawurlencode($domain);
+ $url=$hash?'https://gravatar.bluecdn.com/avatar/'.$hash.'?s='.($size*2).'&d=404':$fallback;
+ return '<img class="feng-friend-avatar-img" src="'.esc_url($url).'" data-friend-fallback="'.esc_url($fallback).'" width="'.absint($size).'" height="'.absint($size).'" alt="" loading="lazy" decoding="async"><span class="feng-friend-avatar-initial" hidden aria-hidden="true">'.esc_html(mb_substr(wp_specialchars_decode($friend->link_name),0,1)).'</span>';
+}
+add_action('add_meta_boxes_link',function(){add_meta_box('feng-friend-avatar','邮箱头像','feng_friend_avatar_box','link','side');});
+function feng_friend_avatar_box($link){
+ wp_nonce_field('feng_friend_avatar','feng_friend_avatar_nonce');$all=get_option('feng_friend_avatars',array());$v=$all[(int)($link->link_id??0)]??array();
+ echo '<p><label for="feng-friend-email">友链站长邮箱</label></p><input type="email" class="widefat" id="feng-friend-email" name="feng_friend_email" autocomplete="off" value=""><p class="description">填写后仅保存 Gravatar 哈希，不额外保存邮箱原文。留空保留设置；未手动指定时，自动匹配已审核评论的网站域名。</p>';
+ if(!empty($v['manual']))echo '<p>已设置手动邮箱头像。</p><label><input type="checkbox" name="feng_friend_email_clear" value="1"> 清除手动设置，恢复自动匹配</label>';
+ elseif(!empty($v['hash']))echo '<p>已从审核通过的评论匹配头像。</p>';
+ else echo '<p>尚未匹配邮箱，将显示网站徽标。</p>';
+}
+function feng_friend_avatar_save($id){
+ if(!current_user_can('manage_links')||empty($_POST['feng_friend_avatar_nonce'])||!wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['feng_friend_avatar_nonce'])),'feng_friend_avatar'))return;
+ $all=get_option('feng_friend_avatars',array());if(!isset($all[$id]))return;
+ if(!empty($_POST['feng_friend_email_clear']))$all[$id]['manual']='';
+ $email=isset($_POST['feng_friend_email'])&&is_string($_POST['feng_friend_email'])?trim(wp_unslash($_POST['feng_friend_email'])):'';
+ if(is_email($email))$all[$id]['manual']=md5(strtolower($email));update_option('feng_friend_avatars',$all,false);
+}
+add_action('add_link','feng_friend_avatar_save',60);add_action('edit_link','feng_friend_avatar_save',60);
+add_action('wp_enqueue_scripts',function(){wp_enqueue_script('feng-friend-avatar',get_theme_file_uri('/assets/js/friend-avatar.js'),array(),feng_asset_version('/assets/js/friend-avatar.js'),true);});
+?>
+<?php
+/** feed */
 /** Friend subscriptions: bounded local snapshots, RSS/Atom ingestion and WP-Cron. */
 if (!defined('ABSPATH')) exit;
 
@@ -197,3 +247,60 @@ function feng_feed_ensure_page() {
  if (!is_wp_error($id) && $id) update_option('feng_feed_page_ready',1,false);
 }
 add_action('init','feng_feed_ensure_page',35);
+?>
+<?php
+/** feed-ui */
+/** Subscription page and native WordPress settings UI. */
+if (!defined('ABSPATH')) exit;
+function feng_feed_rows($items) {
+ ob_start();
+ foreach($items as $entry) { ?>
+ <article class="feng-feed-entry"><span class="feng-feed-entry__mark" aria-hidden="true"><?php echo feng_friend_avatar($entry['source'],40); ?></span><div class="feng-feed-entry__body"><div class="feng-feed-entry__meta"><span><?php echo esc_html($entry['source_name']); ?></span><span>·</span><?php if($entry['published']) { ?><time datetime="<?php echo esc_attr(gmdate('c',$entry['published'])); ?>"><?php echo esc_html(wp_date(wp_date('Y',$entry['published'])===wp_date('Y')?'m 月 d 日 H:i':'Y 年 m 月 d 日',$entry['published'])); ?></time><?php } else { ?><span>发布时间未提供</span><?php } ?><?php if($entry['today']) { ?><span class="feng-feed-today">今日</span><?php } ?></div><h2><a href="<?php echo esc_url($entry['url']); ?>" target="_blank" rel="noopener noreferrer"><?php echo esc_html($entry['title']); ?></a></h2><?php if($entry['summary']) { ?><p><?php echo esc_html($entry['summary']); ?></p><?php } ?></div></article>
+ <?php }
+ return ob_get_clean();
+}
+function feng_feed_list($source=0,$today=false,$page=1) {
+ $data=feng_feed_data();
+ $items=array_values(array_filter($data['items'],static function($entry) use($source,$today) { return (!$source || $entry['source']===$source) && (!$today || $entry['today']); }));
+ $total=count($items); $page=max(1,$page);
+ return array('html'=>feng_feed_rows(array_slice($items,($page-1)*30,30)),'total'=>$total,'more'=>$page*30<$total,'page'=>$page);
+}
+function feng_feed_list_ajax() {
+ $source=isset($_GET['source']) && is_scalar($_GET['source'])?absint($_GET['source']):0;
+ $page=isset($_GET['page']) && is_scalar($_GET['page'])?min(10000,max(1,absint($_GET['page']))):1;
+ wp_send_json_success(feng_feed_list($source,isset($_GET['today']) && $_GET['today']==='1',$page));
+}
+add_action('wp_ajax_feng_feed_list','feng_feed_list_ajax');
+add_action('wp_ajax_nopriv_feng_feed_list','feng_feed_list_ajax');
+function feng_feed_assets() {
+ wp_enqueue_style('feng-feed',get_theme_file_uri('/assets/css/feed.css'),array('feng-navigation'),feng_asset_version('/assets/css/feed.css'));
+ wp_enqueue_script('feng-feed',get_theme_file_uri('/assets/js/feed.js'),array('xf-app'),feng_asset_version('/assets/js/feed.js'),array('strategy'=>'defer','in_footer'=>true));
+}
+add_action('wp_enqueue_scripts','feng_feed_assets');
+function feng_feed_admin_assets($hook) {
+ if ($hook!=='appearance_page_feng-settings') return;
+ wp_enqueue_script('feng-feed-admin',get_theme_file_uri('/assets/js/feed-admin.js'),array(),feng_asset_version('/assets/js/feed-admin.js'),true);
+}
+add_action('admin_enqueue_scripts','feng_feed_admin_assets');
+function feng_feed_settings_status() {
+ $data=feng_feed_data(); $cycle=$data['cycle']; $next=wp_next_scheduled('feng_feed_refresh'); ?>
+ <p>在<a href="<?php echo esc_url(admin_url('link-manager.php')); ?>">友情链接</a>中编辑站点，展开「高级」，填写原生「RSS 地址」。支持 RSS / Atom，仅同步公开可见的友链。</p>
+ <p>菜单角标按 WordPress 站点时区（<?php echo esc_html(wp_timezone_string()); ?>）统计今日零点后发布、已经同步的文章。首次导入的旧文章不计入今日更新。</p>
+ <p>已添加 <?php echo count($data['sources']); ?> 个订阅源 · 今日 <?php echo (int)$data['today']; ?> 篇 · 下次计划：<?php echo $next?esc_html(wp_date('m-d H:i',$next)):'尚未安排'; ?></p>
+ <p><button type="button" class="button button-secondary" data-feed-refresh data-endpoint="<?php echo esc_url(admin_url('admin-ajax.php')); ?>" data-nonce="<?php echo esc_attr(wp_create_nonce('feng_feed_refresh')); ?>">立即同步订阅</button> <span data-feed-admin-status role="status"><?php echo !empty($cycle['pending'])?'正在同步，剩余 '.count($cycle['pending']).' 个订阅源。':(!empty($cycle['finished'])?esc_html('上次同步：'.wp_date('m-d H:i',$cycle['finished']).' · 新收录 '.$cycle['added'].' 篇 · 失败 '.$cycle['errors'].' 个源'):'等待首次同步。'); ?></span></p>
+ <p class="description">每个友链保留最近 200 篇已获取记录，不下载全文或附件。源站只提供最近几篇时，首次同步也只能获取这些文章。同步失败保留旧记录。定时任务由 WordPress WP-Cron 执行，低访问量站点可能延后；需要准时执行时，可由服务器定时调用 wp-cron.php。</p>
+ <?php if(defined('DISABLE_WP_CRON') && DISABLE_WP_CRON) echo '<p class="description">当前环境关闭了 WP-Cron 自动触发。请确认服务器已配置定时调用；手动同步仍可正常使用。</p>'; ?>
+ <?php foreach($data['sources'] as $source) if($source['error']) echo '<p class="description">'.esc_html($source['name'].'：'.$source['error']).'</p>'; ?>
+ <p><a href="<?php echo esc_url(feng_page_url('subscriptions')); ?>">查看订阅页面</a> · <a href="<?php echo esc_url(admin_url('nav-menus.php')); ?>">把「订阅」添加到自定义菜单</a></p>
+ <?php
+}
+function feng_feed_admin_refresh() {
+ if ($_SERVER['REQUEST_METHOD']!=='POST' || !current_user_can('manage_options')) wp_send_json_error(array('message'=>'没有同步权限。'),403);
+ check_ajax_referer('feng_feed_refresh','nonce');
+ $start=isset($_POST['start']) && $_POST['start']==='1';
+ if ($start && get_transient('feng_feed_manual_cooldown')) wp_send_json_error(array('message'=>'刚刚同步过，请一分钟后再试。'),429);
+ if ($start) set_transient('feng_feed_manual_cooldown',1,60);
+ $cycle=feng_feed_run($start);
+ wp_send_json_success(array('pending'=>count($cycle['pending']??array()),'done'=>$cycle['done']??0,'total'=>$cycle['total']??0,'added'=>$cycle['added']??0,'errors'=>$cycle['errors']??0));
+}
+add_action('wp_ajax_feng_feed_refresh','feng_feed_admin_refresh');
