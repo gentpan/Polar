@@ -1,5 +1,5 @@
 <?php
-/** Template Name: Polar · 关于 */
+/** Template Name: ShanYing · 关于 */
 if(!defined('ABSPATH')) exit;
 get_header();while(have_posts()):the_post();
 if(post_password_required()) { echo '<section class="feng-panel">'.get_the_password_form().'</section>';continue; }

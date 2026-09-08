@@ -1,0 +1,31 @@
+{
+  "mode": "Built-in image_gen",
+  "day": "Use case: stylized-concept. Create a wide 2:1 website Hero landscape of Mount Fuji viewed across a tranquil Japanese lake. Reference image is STYLE REFERENCE ONLY: match its detailed painterly digital illustration, warm atmospheric depth and fine brushwork, not its composition. New fixed composition for a seven-weather/time set: Mount Fuji snowcap centered at x=58%, summit at y=38%, lake shore at y=65%, blue lake bottom third, small dark pine silhouettes at far edges only, open sky top third. Bright clear midday, beautiful natural blue and emerald colors, detailed but calm. No people, buildings, writing, logos, visible sun disk, moon, stars or foreground objects. Sun and moon will be added programmatically, do not paint them. Whole image full bleed, no fade or UI overlays. Generate high quality 2000x1000 or similar exact 2:1.",
+  "variants": [
+    [
+      "dawn",
+      "early dawn, soft pink and pale gold sky with lavender shadowed mountains, a light mist over lake, gentle light from the left"
+    ],
+    [
+      "sunset",
+      "warm late sunset, amber and peach sky, soft violet distant mountains, golden reflections on lake, warm light from the right"
+    ],
+    [
+      "night",
+      "deep midnight, indigo navy sky, subtle small stars, blue silver snowy summit and dark pine silhouettes, low light silver reflections on the lake"
+    ],
+    [
+      "cloud",
+      "overcast daytime, layered soft gray cloud cover, muted slate blue mountains and silver lake, diffuse soft light"
+    ],
+    [
+      "rain",
+      "rainy daytime, dense blue gray rain clouds and distant mist partly veiling the foothills, wet darker landscape and fine ripples on lake, NO foreground rain streaks; those will be animated separately"
+    ],
+    [
+      "snow",
+      "snowy daytime, soft pale gray winter sky, fresh snow on shore and forest and mountain, icy pale blue lake, cozy calm winter atmosphere, NO foreground snowflakes; those will be animated separately"
+    ]
+  ],
+  "invariants": "Use day as edit reference; preserve geometry, framing, brushwork. No sun/moon disk or UI. Only change lighting and weather."
+}

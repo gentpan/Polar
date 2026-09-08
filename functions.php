@@ -1,5 +1,5 @@
 <?php
-/** Polar: shared helpers live here; larger features remain in inc/. */
+/** ShanYing: shared helpers live here; larger features remain in inc/. */
 if (!defined('ABSPATH')) exit;
 
 require_once get_template_directory() . '/inc/inc-settings.php';
@@ -132,7 +132,7 @@ add_action('admin_enqueue_scripts',function(){
 /** customizer */
 if (!defined('ABSPATH')) exit;
 function feng_customize($manager) {
- $manager->add_section('feng_appearance',array('title'=>'Polar · 快速外观','priority'=>30));
+ $manager->add_section('feng_appearance',array('title'=>'ShanYing · 快速外观','priority'=>30));
  foreach(array('xf_eyebrow','xf_hero_intro') as $key) {
   foreach(feng_settings_schema() as $group) if(isset($group['fields'][$key])) $field=$group['fields'][$key];
   $id='feng_settings['.$key.']';
@@ -214,7 +214,10 @@ function feng_category_badge_field($term=null){
  $code=$term instanceof WP_Term?get_term_meta($term->term_id,'feng_category_icon',true):'';
  wp_nonce_field('feng_category_badge','feng_category_badge_nonce');
  $cover=$term instanceof WP_Term?get_term_meta($term->term_id,'feng_category_cover',true):'';
- echo '<div class="feng-category-cover-field"><p><label for="feng-category-cover">分类固定封面（首页与控制面板）</label></p><div style="display:flex;gap:6px"><input type="url" class="large-text" id="feng-category-cover" name="feng_category_cover" value="'.esc_attr($cover).'" placeholder="图片 URL"><button type="button" class="button" data-category-cover-choose>选择图片</button><button type="button" class="button" data-category-cover-clear>清除</button></div><p class="description">建议使用宽幅图片。留空时使用该分类最新公开文章的封面，无封面时显示渐变背景。</p></div>';
+ echo '<div class="feng-category-cover-field"><p><label for="feng-category-cover">分类固定封面（首页与控制面板）</label></p><div style="display:flex;gap:6px"><input type="url" class="large-text" id="feng-category-cover" name="feng_category_cover" value="'.esc_attr($cover).'" placeholder="图片 URL"><button type="button" class="button" data-category-cover-choose>选择或上传图片</button><button type="button" class="button" data-category-cover-clear>清除</button></div><p class="description">建议 800 × 400px，图片以居中裁切铺满首页分类区块。重要图案与文字请放在中央。</p></div>';
+
+ $show_text=!($term instanceof WP_Term)||get_term_meta($term->term_id,'feng_category_hide_text',true)!=='1';
+ echo '<p><label><input type="checkbox" name="feng_category_show_text" value="1" '.checked($show_text,true,false).'> 首页分类区块显示图标与名称</label></p><p class="description">图片已经包含分类名称时可关闭；没有图片时仍显示名称。</p>';
 
  echo '<p><label for="feng-category-icon">Font Awesome 类名 / SVG 代码</label></p><textarea id="feng-category-icon" name="feng_category_icon" rows="3" class="large-text code" placeholder="fa-sharp fa-solid fa-house">'.esc_textarea($code).'</textarea><div data-icon-preview style="font-size:28px;min-height:40px;margin:8px 0">'.feng_badge_icon_markup($code).'</div><p class="description">支持 Pro 原始类名、完整 &lt;i&gt; 标签或纯路径 SVG 代码。填写代码时优先显示代码图标；清空后使用下方图片。</p>';
 
@@ -224,6 +227,7 @@ add_action('category_add_form_fields',function(){echo '<div class="form-field"><
 add_action('category_edit_form_fields',function($term){echo '<tr class="form-field"><th scope="row">分类徽章</th><td>';feng_category_badge_field($term);echo '</td></tr>';});
 function feng_save_category_badge($id){
  if(!current_user_can('manage_categories')||empty($_POST['feng_category_badge_nonce'])||!wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['feng_category_badge_nonce'])),'feng_category_badge'))return;
+ update_term_meta($id,'feng_category_hide_text',isset($_POST['feng_category_show_text'])?'0':'1');
  if(isset($_POST['feng_category_cover'])&&is_string($_POST['feng_category_cover']))update_term_meta($id,'feng_category_cover',esc_url_raw(wp_unslash($_POST['feng_category_cover']),array('http','https')));
  if(isset($_POST['feng_category_icon'])&&is_string($_POST['feng_category_icon'])){$code=feng_badge_icon_code(wp_unslash($_POST['feng_category_icon']));if($code)update_term_meta($id,'feng_category_icon',$code);else delete_term_meta($id,'feng_category_icon');}
  $attachment=isset($_POST['feng_category_badge'])?absint($_POST['feng_category_badge']):0;
@@ -358,9 +362,8 @@ function feng_page_title_icon() {
  return '<i class="fa-solid fa-'.esc_attr($icon).' feng-page-title-icon" aria-hidden="true"></i>';
 }
 function feng_page_heading($eyebrow,$intro='') {
- echo '<header class="feng-page-heading" data-xf-reveal><p class="xf-section-kicker">'.esc_html($eyebrow).'</p><h1>'.feng_page_title_icon().esc_html(get_the_title()).'</h1>';
- if($intro) echo '<p>'.nl2br(esc_html($intro)).'</p>';
- echo '</header>';
+ echo '<header class="feng-page-heading feng-unified-heading"><h1>'.feng_page_title_icon().esc_html(get_the_title()).'</h1></header>';
+ if($intro) echo '<p class="feng-page-introduction">'.nl2br(esc_html($intro)).'</p>';
 }
 
 /** Archive filters use native WordPress rewrite rules, not query-string links. */
@@ -601,7 +604,7 @@ function feng_weekly_github_stats(){
  if(false===$cache){
   $cache=array('events'=>array(),'complete'=>false,'error'=>false);
   for($page=1;$page<=3;$page++){
-   $response=wp_remote_get('https://api.github.com/users/gentpan/events/public?per_page=100&page='.$page,array('timeout'=>8,'headers'=>array('Accept'=>'application/vnd.github+json','User-Agent'=>'Polar-xifeng.net')));
+   $response=wp_remote_get('https://api.github.com/users/gentpan/events/public?per_page=100&page='.$page,array('timeout'=>8,'headers'=>array('Accept'=>'application/vnd.github+json','User-Agent'=>'ShanYing-xifeng.net')));
    if(is_wp_error($response)||200!==wp_remote_retrieve_response_code($response)){$cache['error']=true;break;}
    $events=json_decode(wp_remote_retrieve_body($response),true);
    if(!is_array($events)){$cache['error']=true;break;}
@@ -628,7 +631,7 @@ require_once get_template_directory() . '/inc/inc-talk.php';
 require_once get_template_directory() . '/inc/inc-comment.php';
 
 /* ===== 控制面板辅助 ===== */
-/** Public site dashboard: published content only. @package Polar */
+/** Public site dashboard: published content only. @package ShanYing */
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
 function feng_dashboard_calendar( $month = '' ) {
@@ -747,7 +750,7 @@ add_action('init',static function() {
  foreach(array('feng-note'=>'说明','feng-tip'=>'小提示','feng-warning'=>'注意事项') as $name=>$label) {
   foreach(array('core/group','core/paragraph') as $block) register_block_style($block,array('name'=>$name,'label'=>$label));
  }
- register_block_pattern_category('feng-reading',array('label'=>'Polar · 阅读组件'));
+ register_block_pattern_category('feng-reading',array('label'=>'ShanYing · 阅读组件'));
  register_block_pattern('feng/reading-note',array('title'=>'阅读提示卡','categories'=>array('feng-reading'),'content'=>'<!-- wp:group {"className":"is-style-feng-note","layout":{"type":"constrained"}} --><div class="wp-block-group is-style-feng-note"><!-- wp:paragraph --><p><strong>写在前面</strong></p><!-- /wp:paragraph --><!-- wp:paragraph --><p>在这里补充背景、适用范围或阅读建议。</p><!-- /wp:paragraph --></div><!-- /wp:group -->'));
  register_block_pattern('feng/reading-questions',array('title'=>'折叠问答','categories'=>array('feng-reading'),'content'=>'<!-- wp:details --><details class="wp-block-details"><summary>这里写一个读者可能关心的问题</summary><!-- wp:paragraph --><p>在这里给出解释，读者点击问题就能展开。</p><!-- /wp:paragraph --></details><!-- /wp:details -->'));
 });
@@ -1022,6 +1025,7 @@ function feng_visitor_stats_ping(){
  if($event!==''&&$old!==$event){
   $ip=$_SERVER['REMOTE_ADDR']??'';
   $geo=feng_comment_geo_lookup($ip);
+  if(!$geo&&($preview=feng_local_preview_geo()))$geo=array('label'=>sanitize_text_field($preview['city']??$preview['region']??''),'code'=>strtolower(sanitize_text_field($preview['country_code']??'')));
   if($geo){$location=$geo;set_transient('polar_latest_visitor_location',$geo,DAY_IN_SECONDS);}
  }
  wp_send_json_success(array('online'=>$online,'views'=>$total,'location'=>$location?:null));
@@ -1077,12 +1081,21 @@ function feng_weather_city($name){
 function feng_weather_current($city){
  if(!$city||!is_numeric($city['latitude']??null)||!is_numeric($city['longitude']??null))return null;
  $lat=(float)$city['latitude'];$lon=(float)$city['longitude'];if(abs($lat)>90||abs($lon)>180)return null;
- $data=feng_weather_json(add_query_arg(array('latitude'=>round($lat,2),'longitude'=>round($lon,2),'current'=>'temperature_2m,weather_code,is_day','timezone'=>'auto'),'https://api.open-meteo.com/v1/forecast'));
+ $data=feng_weather_json(add_query_arg(array('latitude'=>round($lat,2),'longitude'=>round($lon,2),'current'=>'temperature_2m,weather_code,is_day','daily'=>'sunrise,sunset','forecast_days'=>2,'timeformat'=>'unixtime','timezone'=>'auto'),'https://api.open-meteo.com/v1/forecast'));
  $c=$data['current']??null;if(!is_numeric($c['temperature_2m']??null)||!isset($c['weather_code']))return null;
- return array('city'=>sanitize_text_field($city['name']??''),'temperature'=>round($c['temperature_2m']),'code'=>(int)$c['weather_code'],'day'=>(bool)($c['is_day']??true),'time'=>sanitize_text_field($c['time']??''));
+ return array('latitude'=>round($lat,2),'longitude'=>round($lon,2),'city'=>sanitize_text_field($city['name']??''),'temperature'=>round($c['temperature_2m']),'code'=>(int)$c['weather_code'],'day'=>(bool)($c['is_day']??true),'time'=>sanitize_text_field((string)($c['time']??'')),'timezone'=>sanitize_text_field($data['timezone']??'UTC'),'utc_offset'=>(int)($data['utc_offset_seconds']??0),'sunrise'=>array_map('intval',$data['daily']['sunrise']??array()),'sunset'=>array_map('intval',$data['daily']['sunset']??array()));
+}
+/** Local preview uses this machine's public network location, never a made-up visitor. */
+function feng_local_preview_geo(){
+ $host=strtolower((string)wp_parse_url(home_url(),PHP_URL_HOST));
+ $local=wp_get_environment_type()==='local'||$host==='localhost'||str_ends_with($host,'.local')||in_array($host,array('127.0.0.1','[::1]'),true);
+ $ip=$_SERVER['REMOTE_ADDR']??'';
+ if(!$local||filter_var($ip,FILTER_VALIDATE_IP,FILTER_FLAG_NO_PRIV_RANGE|FILTER_FLAG_NO_RES_RANGE))return null;
+ $geo=feng_weather_json('https://ipwho.is/?fields=success,city,region,country_code,latitude,longitude',HOUR_IN_SECONDS);
+ return !empty($geo['success'])?$geo:null;
 }
 function feng_weather_ajax(){
- nocache_headers();if(!feng_setting('greeting_weather',true))wp_send_json_error(null,404);
+ nocache_headers();if(!feng_setting('greeting_weather',true)&&!feng_setting('hero_smart_scene',true))wp_send_json_error(null,404);
  $kind=is_string($_GET['kind']??null)?$_GET['kind']:'host';$city=null;
  if($kind==='visitor'){
   if(!feng_setting('weather_visitor',true))wp_send_json_success(null);
@@ -1091,9 +1104,26 @@ function feng_weather_ajax(){
   if(filter_var($ip,FILTER_VALIDATE_IP,FILTER_FLAG_NO_PRIV_RANGE|FILTER_FLAG_NO_RES_RANGE)){
    $geo=feng_weather_json('https://ipwho.is/'.rawurlencode($ip).'?fields=success,city,latitude,longitude',HOUR_IN_SECONDS);
    if(!empty($geo['success']))$city=array('name'=>$geo['city']??'','latitude'=>$geo['latitude']??null,'longitude'=>$geo['longitude']??null);
+  }elseif($geo=feng_local_preview_geo()){
+   $city=array('name'=>$geo['city']??'','latitude'=>$geo['latitude']??null,'longitude'=>$geo['longitude']??null);
   }
  }else $city=feng_weather_city(feng_setting('weather_city',''));
  wp_send_json_success(feng_weather_current($city));
 }
 add_action('wp_ajax_feng_weather','feng_weather_ajax');add_action('wp_ajax_nopriv_feng_weather','feng_weather_ajax');
 
+
+/** Shared search form, used by WordPress get_search_form(). */
+function feng_search_form_markup($form, $args = array()) {
+    ob_start();
+?>
+<?php $feng_search_id = wp_unique_id( ! empty( $args['xf_dialog'] ) ? 'xf-dialog-search-' : 'xf-page-search-' ); ?>
+<form role="search" method="get" class="xf-search" action="<?php echo esc_url( home_url( '/' ) ); ?>">
+	<label class="screen-reader-text" for="<?php echo esc_attr( $feng_search_id ); ?>"><?php esc_html_e( '搜索文章', 'feng' ); ?></label>
+	<input id="<?php echo esc_attr( $feng_search_id ); ?>" type="search" name="s" value="<?php echo esc_attr( get_search_query( false ) ); ?>" placeholder="<?php esc_attr_e( '搜索文章…', 'feng' ); ?>">
+	<button type="submit"><?php esc_html_e( '搜索', 'feng' ); ?></button>
+</form>
+<?php
+    return ob_get_clean();
+}
+add_filter('get_search_form', 'feng_search_form_markup', 10, 2);

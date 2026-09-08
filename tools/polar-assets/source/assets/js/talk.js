@@ -14,9 +14,13 @@
    const footer=document.querySelector('.xf-footer');
    const near=!!footer&&window.scrollY>10&&footer.getBoundingClientRect().top<window.innerHeight;
    if(footer){footer.toggleAttribute('data-talk-footer-visible',near);footer.inert=!near;}
-   dock.classList.toggle('is-near-footer',near);dock.inert=false;
-   root.style.setProperty('--talk-footer-clearance',near?Math.max(0,window.innerHeight-footer.getBoundingClientRect().top)+24+'px':'0px');
+   const boundary=(root.closest('#xf-content')||root).getBoundingClientRect().bottom;
+   const clearance=Math.max(0,window.innerHeight-boundary+24);
+   dock.classList.toggle('is-near-footer',clearance>22);dock.inert=false;
+   root.style.setProperty('--talk-footer-clearance',clearance+'px');
   }
+  const dockObserver=typeof ResizeObserver==='function'?new ResizeObserver(syncFooterDock):null;
+  dockObserver?.observe(root.closest('#xf-content')||root);
   on(window,'scroll',syncFooterDock);on(window,'resize',syncFooterDock);syncFooterDock();
   const uuid=()=>{
    if(typeof crypto.randomUUID==='function')return crypto.randomUUID();
@@ -163,7 +167,7 @@
   try{if(localStorage.getItem('feng-talk-layout')==='neat'){root.classList.add('is-neat');$('[data-talk-layout]').setAttribute('aria-pressed','true');$('[data-talk-layout]').setAttribute('aria-label','切换为错落排列');}}catch{}
   layoutCards();const sessionReady=session().catch(e=>notify(e.message));
   const match=location.hash.match(/^#talk-(\d+)$/);if(match)showDetail(Number(match[1]));
-  cleanup=()=>{const footer=document.querySelector('.xf-footer');if(footer){footer.inert=false;footer.removeAttribute('data-talk-footer-visible');}life.abort();cardObserver?.disconnect();controllers.forEach(c=>c.abort());timers.forEach(clearTimeout);revoke();[detail,compose].forEach(d=>{if(d.open)d.close();});document.documentElement.classList.remove('feng-talk-modal-open');};
+  cleanup=()=>{const footer=document.querySelector('.xf-footer');if(footer){footer.inert=false;footer.removeAttribute('data-talk-footer-visible');}life.abort();dockObserver?.disconnect();cardObserver?.disconnect();controllers.forEach(c=>c.abort());timers.forEach(clearTimeout);revoke();[detail,compose].forEach(d=>{if(d.open)d.close();});document.documentElement.classList.remove('feng-talk-modal-open');};
  }
  document.addEventListener('xf:before-unmount',()=>cleanup());document.addEventListener('xf:mounted',mount);mount();
 })();

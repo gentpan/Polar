@@ -1,5 +1,5 @@
 <?php
-/** Compact recent-post row; collection covers use their own template. @package Polar */
+/** Compact recent-post row; collection covers use their own template. @package ShanYing */
 if ( ! defined('ABSPATH') ) { exit; }
 $entry=get_post();
 $categories=get_the_category($entry->ID);

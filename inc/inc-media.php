@@ -122,7 +122,7 @@ add_action('wp_enqueue_scripts',function(){
 <?php
 /** icons */
 if (!defined('ABSPATH')) exit;
-/** Polar outline icons: one 24px grid, rounded 1.6px strokes, no icon font dependency. */
+/** ShanYing outline icons: one 24px grid, rounded 1.6px strokes, no icon font dependency. */
 function feng_icon($name, $class = '') {
  if($name==='github'||$name==='x')return '<span class="feng-icon feng-brand-animation '.esc_attr($class).'" data-lordicon-content="'.($name==='x'?'twitter':'github').'" aria-hidden="true"><i class="fa-brands fa-'.($name==='x'?'x-twitter':'github').'"></i></span>';
 

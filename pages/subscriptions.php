@@ -1,13 +1,13 @@
 <?php
-/** Template Name: Polar · 订阅 */
+/** Template Name: ShanYing · 订阅 */
 if(!defined('ABSPATH')) exit;
 get_header(); while(have_posts()): the_post();
 if(post_password_required()) { echo '<section class="feng-panel">'.get_the_password_form().'</section>'; continue; }
 $data=feng_feed_data(); $list=feng_feed_list(); $cycle=$data['cycle'];
 ?>
 <div class="feng-panel feng-special-page feng-subscriptions" data-feed-page>
-<header class="feng-page-heading feng-feed-hero" data-xf-reveal>
-<div class="feng-feed-hero-copy"><p class="xf-section-kicker">FROM OUR NEIGHBORS / SUBSCRIPTIONS</p><h1><?php echo feng_page_title_icon(); the_title(); ?></h1><p>看看朋友们，最近又记录了什么。</p></div>
+<header class="feng-page-heading feng-feed-hero feng-unified-heading" data-xf-reveal>
+<div class="feng-feed-hero-copy"><h1><?php echo feng_page_title_icon(); the_title(); ?></h1></div>
 <div class="feng-feed-overview"><span><?php echo feng_icon('rss'); ?> <strong><?php echo count($data['sources']); ?></strong> 个订阅</span><span><strong data-feed-today-number><?php echo (int)$data['today']; ?></strong> 篇今日更新</span><span class="feng-feed-last-sync"><?php echo feng_icon('clock'); ?> <span><?php echo !empty($cycle['finished'])?esc_html('上次同步 '.wp_date('Y-m-d H:i',$cycle['finished'])):'尚未同步'; ?></span></span></div>
 </header>
 <div class="feng-feed-toolbar"><div class="feng-feed-tabs" role="group" aria-label="更新范围"><button type="button" data-feed-period="all" aria-pressed="true">全部动态</button><button type="button" data-feed-period="today" aria-pressed="false">今日更新</button></div></div>

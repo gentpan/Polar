@@ -29,18 +29,33 @@ foreach($recent_visitors as $key=>$comment){
 }
 ?>
 <noscript><style>.feng-photo-stack[data-stack-loading] .feng-stack-front{opacity:1}</style></noscript>
-<section class="xf-stage feng-profile-hero" aria-labelledby="xf-stage-title" data-xf-stage>
- <?php if(feng_setting('greeting_weather',true)): ?>
- <details class="feng-hero-weather" data-hero-weather data-animated="<?php echo feng_setting('weather_animation',true)?'true':'false'; ?>" data-visitor="<?php echo feng_setting('weather_visitor',true)?'true':'false'; ?>" data-endpoint="<?php echo esc_url(admin_url('admin-ajax.php')); ?>" hidden>
+<?php
+$footer_background=feng_setting('footer_background','');
+if(feng_setting('footer_seasonal',true)){
+ $month=(int)wp_date('n');
+ $season=$month>=3&&$month<=5?'spring':($month>=6&&$month<=8?'summer':($month>=9&&$month<=11?'autumn':'winter'));
+ $footer_background=feng_setting('footer_'.$season,'')?:($footer_background?:get_theme_file_uri('/assets/images/seasons/'.$season.'.webp'));
+}
+$smart_scene=feng_setting('hero_smart_scene',true);
+$scene_images=array();
+if($smart_scene){
+ foreach(array('dawn','day','sunset','night','cloud','rain','snow') as $scene)$scene_images[$scene]=get_theme_file_uri('/assets/images/hero-fuji/'.$scene.'.webp');
+ $footer_background=$scene_images['day'];
+}
+?>
+<section class="xf-stage feng-profile-hero" aria-labelledby="xf-stage-title" data-xf-stage<?php if($smart_scene): ?> data-smart-scene data-scene-images="<?php echo esc_attr(wp_json_encode($scene_images)); ?>" data-scene-preview="<?php echo esc_attr(feng_setting('hero_scene_preview','auto')); ?>" data-scene-animation="<?php echo feng_setting('hero_scene_animation',true)?'true':'false'; ?>"<?php endif; ?>>
+ <?php if($footer_background): ?><img class="polar-hero-landscape" src="<?php echo esc_url($footer_background); ?>" alt="" decoding="async" aria-hidden="true"><?php endif; ?>
+ <?php if(feng_setting('greeting_weather',true)||$smart_scene): ?>
+ <details class="feng-hero-weather" data-hero-weather data-watermark-enabled="<?php echo feng_setting('greeting_weather',true)?'true':'false'; ?>" data-animated="<?php echo feng_setting('weather_animation',true)?'true':'false'; ?>" data-visitor="<?php echo feng_setting('weather_visitor',true)?'true':'false'; ?>" data-endpoint="<?php echo esc_url(admin_url('admin-ajax.php')); ?>" hidden>
  <summary aria-label="查看两地天气"><svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><g class="weather-sun"><circle cx="40" cy="32" r="13"/><path d="M40 10v-5m0 49v5M18 32h-5m49 0h5M24 16l-4-4m36 36 4 4M24 48l-4 4m36-36 4-4"/></g><path class="weather-cloud" d="M21 48a11 11 0 1 1 2-22 17 17 0 0 1 33 2 10 10 0 1 1 3 20Z"/><g class="weather-rain"><path d="m27 56-3 8m16-8-3 8m16-8-3 8"/></g><g class="weather-snow"><circle cx="25" cy="59" r="2"/><circle cx="40" cy="63" r="2"/><circle cx="55" cy="58" r="2"/></g><path class="weather-moon" d="M53 45A21 21 0 0 1 32 16a22 22 0 1 0 21 29Z"/></svg></summary>
- <div class="feng-weather-card"><strong>此刻的天气</strong><p data-weather-host hidden></p><p data-weather-visitor hidden></p><small>访客位置根据 IP 估算</small><a href="https://open-meteo.com/" target="_blank" rel="noopener">天气数据 · Open-Meteo</a></div>
+ <div class="feng-weather-card"><p class="polar-weather-date" data-weather-date></p><p data-weather-host hidden></p><p data-weather-visitor hidden></p></div>
  </details>
  <?php endif; ?>
  
  <div class="feng-profile-top">
  <div class="xf-stage__identity"><div class="feng-hero-welcome-row"><p class="xf-welcome" data-feng-greeting><?php echo esc_html(feng_setting('xf_eyebrow','你好，欢迎来到我的生活切片')); ?></p><?php $hero_github=feng_weekly_github_stats(); ?>
  <div class="feng-mini-activity"><a href="https://x.com/gentpan" target="_blank" rel="noopener noreferrer" aria-label="X / Twitter" title="X / Twitter"><i class="feng-icon fa-brands fa-x-twitter" aria-hidden="true"></i></a><a href="https://github.com/gentpan" target="_blank" rel="noopener noreferrer" aria-label="GitHub" title="GitHub"><i class="feng-icon fa-brands fa-github" aria-hidden="true"></i></a>
- <?php if($hero_github!==null): $daily=array_slice($hero_github['daily'],-7,null,true);$peak=max(1,max($daily));$today_pushes=(int)end($daily); ?><span class="feng-mini-caption"><?php echo $today_pushes?'今日 '.$today_pushes.' 次推送':'今日暂无推送'; ?><em> · 近 7 天 <?php echo $hero_github['complete']?'':'至少 '; ?><?php echo (int)array_sum($daily); ?> 次</em></span><div class="feng-mini-bars" aria-label="GitHub 最近七个日期的公开推送，今天尚未结束<?php echo $hero_github['complete']?'':'，数据不完整'; ?>"><?php foreach($daily as $date=>$count): ?><span data-count="<?php echo (int)$count; ?>" tabindex="0" title="<?php echo esc_attr($date.' · '.$count.' 次推送'); ?>" aria-label="<?php echo esc_attr($date.' · '.$count.' 次推送'); ?>"><i style="--bar-height:<?php echo $count?max(8,round($count/$peak*100)):0; ?>%"></i></span><?php endforeach; ?></div><?php else: ?><small>GitHub 暂未同步</small><?php endif; ?>
+ <?php if($hero_github!==null): $daily=array_slice($hero_github['daily'],-7,null,true);$peak=max(1,max($daily));$today_pushes=(int)end($daily); ?><span class="feng-mini-caption"><?php echo $today_pushes?'今日 '.$today_pushes.' 次推送':'今日暂无推送'; ?><em> · 近 7 天 <?php echo $hero_github['complete']?'':'至少 '; ?><?php echo (int)array_sum($daily); ?> 次</em></span><div class="feng-mini-bars" aria-label="GitHub 最近七个日期的公开推送，今天尚未结束<?php echo $hero_github['complete']?'':'，数据不完整'; ?>"><?php foreach($daily as $date=>$count): ?><span data-count="<?php echo (int)$count; ?>" aria-label="<?php echo esc_attr($date.' · '.$count.' 次推送'); ?>"><i style="--bar-height:<?php echo $count?max(8,round($count/$peak*100)):0; ?>%"></i></span><?php endforeach; ?></div><?php else: ?><small>GitHub 暂未同步</small><?php endif; ?>
  </div></div><h1 id="xf-stage-title"><?php echo esc_html(get_bloginfo('description')); ?></h1><div class="feng-hero-latest"><?php if($notes):$note=$notes[0]; ?><a class="feng-hero-note" href="<?php echo esc_url(feng_page_url('talks')); ?>"><small><?php echo feng_icon('comment'); ?><span>最新说说 · <?php echo esc_html(human_time_diff(get_post_time('U',true,$note),time()).'前'); ?></span></small><span><?php echo esc_html(wp_trim_words(wp_strip_all_tags($note->post_content),55,'…')); ?></span></a><?php endif; ?></div>
 
 

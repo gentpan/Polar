@@ -1,0 +1,288 @@
+/* Opt-in ShanYing admin skin. Native markup and editor canvas remain intact. */
+body.wp-admin.polar-admin-skin{--pa-bg:#fafafa;--pa-paper:#fff;--pa-line:rgb(25 28 40 / .1);--pa-text:#202126;--pa-muted:#757782;--pa-accent:#0052D9;--wp-admin-theme-color:#0052D9;--wp-admin-theme-color-darker-10:#0048bf;--wp-admin-theme-color-darker-20:#003da3;background:var(--pa-bg);color:var(--pa-text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;}
+.polar-admin-skin #adminmenuback,.polar-admin-skin #adminmenuwrap,.polar-admin-skin #adminmenu{background:var(--pa-paper);}
+.polar-admin-skin #adminmenuback{border-right:1px solid var(--pa-line);}
+.polar-admin-skin #adminmenu a{color:var(--pa-text);}
+.polar-admin-skin #adminmenu div.wp-menu-image::before,.polar-admin-skin #collapse-button{color:var(--pa-muted);}
+.polar-admin-skin #adminmenu .wp-submenu{background:#f1f2f5;}
+.polar-admin-skin #adminmenu .wp-submenu a{color:#757782;}
+.polar-admin-skin #adminmenu li.menu-top:hover,.polar-admin-skin #adminmenu li.opensub>a.menu-top,.polar-admin-skin #adminmenu li>a.menu-top:focus{background:#f1f2f5;color:var(--pa-accent);}
+.polar-admin-skin #adminmenu li.current>a.menu-top,.polar-admin-skin #adminmenu li.wp-has-current-submenu>a.wp-has-current-submenu{background:var(--pa-accent);color:#fff;}
+.polar-admin-skin #adminmenu li.wp-has-current-submenu div.wp-menu-image::before,.polar-admin-skin #adminmenu li.current div.wp-menu-image::before{color:#fff;}
+.polar-admin-skin #adminmenu .wp-submenu li.current a{color:var(--pa-accent);font-weight:600;}
+.polar-admin-skin #wpadminbar{background:#fff;color:var(--pa-text);border-bottom:1px solid var(--pa-line);}
+.polar-admin-skin #wpadminbar .ab-item,.polar-admin-skin #wpadminbar .ab-icon:before,.polar-admin-skin #wpadminbar .ab-item:before{color:#757782;}
+.polar-admin-skin #wpadminbar .ab-sub-wrapper{background:#fff;border:1px solid var(--pa-line);box-shadow:0 8px 24px #23344d14;}
+.polar-admin-skin #wpadminbar .menupop.hover>.ab-item,.polar-admin-skin #wpadminbar .ab-top-menu>li:hover>.ab-item{background:#f1f2f5;color:var(--pa-accent);}
+.polar-admin-skin .wrap>h1{font-size:25px;font-weight:600;line-height:1.4;margin:12px 0 18px;color:var(--pa-text);}
+.polar-admin-skin .wrap>h2{color:var(--pa-text);}
+.polar-admin-skin .widefat,.polar-admin-skin .postbox,.polar-admin-skin .stuffbox,.polar-admin-skin .card{border:1px solid var(--pa-line);box-shadow:none;background:var(--pa-paper);}
+.polar-admin-skin .widefat thead td,.polar-admin-skin .widefat thead th,.polar-admin-skin .widefat tfoot td,.polar-admin-skin .widefat tfoot th{border-color:var(--pa-line);background:#f1f2f5;font-weight:600;}
+.polar-admin-skin .widefat td,.polar-admin-skin .widefat th{padding-top:12px;padding-bottom:12px;}
+.polar-admin-skin .striped>tbody>:nth-child(odd){background:#fafafa;}
+.polar-admin-skin .widefat .row-title{font-weight:600;}
+.polar-admin-skin .postbox-header{border-bottom:1px solid var(--pa-line);background:#fafafa;}
+.polar-admin-skin .wp-core-ui .button,.wp-core-ui.polar-admin-skin .button{border-color:#dcdcde;border-radius:0;background:#fff;color:var(--pa-accent);box-shadow:none;}
+.wp-core-ui.polar-admin-skin .button-primary{background:var(--pa-accent);border-color:var(--pa-accent);color:#fff;text-shadow:none;}
+.wp-core-ui.polar-admin-skin .button-primary:hover{background:#0048bf;border-color:#0048bf;color:#fff;}
+.polar-admin-skin #wpbody-content input:is([type=text],[type=email],[type=url],[type=search],[type=number],[type=password]),.polar-admin-skin #wpbody-content select,.polar-admin-skin #wpbody-content textarea{border-color:#dcdcde;border-radius:0;background:#fff;color:var(--pa-text);box-shadow:none;}
+.polar-admin-skin #wpbody-content input:focus,.polar-admin-skin #wpbody-content select:focus,.polar-admin-skin #wpbody-content textarea:focus{border-color:var(--pa-accent);box-shadow:0 0 0 1px var(--pa-accent);}
+.polar-admin-skin .description,.polar-admin-skin #wpfooter{color:var(--pa-muted);}
+.polar-admin-skin .nav-tab{border-color:var(--pa-line);background:#f1f2f5;}.polar-admin-skin .nav-tab-active{background:var(--pa-paper);border-bottom-color:var(--pa-paper);color:var(--pa-accent);}
+.polar-admin-skin .notice{box-shadow:none;border-top:1px solid var(--pa-line);border-right:1px solid var(--pa-line);border-bottom:1px solid var(--pa-line);}
+.polar-admin-skin .subsubsub a.current{color:var(--pa-accent);}.polar-admin-skin .form-table th{font-weight:600;}
+.polar-admin-skin .media-modal-content{border-radius:0;box-shadow:0 18px 70px #101d3026;}
+@media(max-width:782px){.polar-admin-skin .widefat td,.polar-admin-skin .widefat th{padding-top:10px;padding-bottom:10px;}.polar-admin-skin .wrap>h1{font-size:22px;}}
+
+/* Match ShanYing's neutral surfaces and accent, including native interaction states. */
+body.wp-admin.polar-admin-skin{color-scheme:light;--wp-admin-theme-color--rgb:0,82,217;--wp-admin-theme-color-darker-10--rgb:0,72,191;--wp-admin-theme-color-darker-20--rgb:0,61,163;}
+.polar-admin-skin #wpbody a{color:var(--pa-accent);}
+.polar-admin-skin #wpbody a:hover{color:#003da3;}
+.polar-admin-skin #wpbody :is(.submitdelete,.trash a){color:#b32d2e;}
+.polar-admin-skin #wpbody :is(.description,.howto,.subsubsub,.tablenav,.displaying-num){color:var(--pa-muted);}
+.polar-admin-skin #wpbody :is(h1,h2,h3,h4,.widefat td,.widefat th,.form-table th){color:var(--pa-text);}
+.polar-admin-skin #adminmenu :is(li.menu-top:hover,li.opensub)>a .wp-menu-image::before{color:var(--pa-accent);}
+.polar-admin-skin #adminmenu :is(li.current,li.wp-has-current-submenu)>a.menu-top,
+.polar-admin-skin #adminmenu :is(li.current,li.wp-has-current-submenu)>a.menu-top:hover{background:var(--pa-paper);color:var(--pa-accent);box-shadow:inset 3px 0 var(--pa-accent);}
+.polar-admin-skin #adminmenu :is(li.current,li.wp-has-current-submenu)>a .wp-menu-image::before{color:var(--pa-accent);}
+.polar-admin-skin #adminmenu .wp-submenu a:is(:hover,:focus){color:var(--pa-accent);background:var(--pa-paper);}
+.polar-admin-skin #adminmenu .wp-menu-arrow{display:none;}
+.polar-admin-skin ul#adminmenu a.wp-has-current-submenu::after,.polar-admin-skin ul#adminmenu>li.current>a.current::after{border-right-color:var(--pa-bg);}
+.polar-admin-skin #wpadminbar .quicklinks .menupop ul li a:is(:hover,:focus),
+.polar-admin-skin #wpadminbar .quicklinks .menupop.hover ul li a:is(:hover,:focus){background:var(--pa-bg);color:var(--pa-accent);}
+.polar-admin-skin #wpadminbar :is(.ab-label,#wp-admin-bar-user-info .display-name){color:var(--pa-text);}
+.polar-admin-skin #wpadminbar :is(.ab-icon::before,.ab-item::before){color:var(--pa-muted);}
+.wp-core-ui.polar-admin-skin .button:is(:hover,:focus){background:var(--pa-bg);border-color:var(--pa-accent);color:var(--pa-accent);}
+.wp-core-ui.polar-admin-skin .button-primary:is(:hover,:focus){background:#0048bf;border-color:#0048bf;color:#fff;}
+.wp-core-ui.polar-admin-skin .button:disabled,.wp-core-ui.polar-admin-skin .button.disabled{background:#f1f2f5!important;border-color:var(--pa-line)!important;color:var(--pa-muted)!important;box-shadow:none!important;}
+.polar-admin-skin #wpbody input:is([type=checkbox],[type=radio]){border-color:#b9bbc3;background:var(--pa-paper);accent-color:var(--pa-accent);}
+.polar-admin-skin #wpbody input[type=checkbox]:checked::before{filter:none;}
+.polar-admin-skin #wpbody input[type=radio]:checked::before{background:var(--pa-accent);}
+.polar-admin-skin .feng-admin{color:var(--pa-text);}
+.polar-admin-skin .feng-admin :is(.feng-settings-section,.feng-admin-save){border-color:var(--pa-line);box-shadow:none;}
+.polar-admin-skin .feng-admin :is(.description,.feng-section-header p,.feng-admin-header p,.feng-nav-label){color:var(--pa-muted);}
+.polar-admin-skin .feng-admin .feng-admin-tabs .nav-tab{color:var(--pa-muted);}
+.polar-admin-skin .feng-admin .feng-admin-tabs .nav-tab:is(:hover,.nav-tab-active){background:#f1f2f5;color:var(--pa-accent);box-shadow:none;}
+.polar-admin-skin .media-frame :is(.media-toolbar,.media-sidebar,.attachments-browser .media-toolbar){background:var(--pa-paper);border-color:var(--pa-line);}
+.polar-admin-skin .media-frame .attachment.details{box-shadow:inset 0 0 0 3px #fff,inset 0 0 0 7px var(--pa-accent);}
+.polar-admin-skin .theme-browser .theme{border-color:var(--pa-line);box-shadow:none;}
+.polar-admin-skin .theme-browser .theme.active .theme-name{background:var(--pa-accent);color:#fff;}
+.polar-admin-skin .plugin-update-tr.active td,.polar-admin-skin .plugins .active td,.polar-admin-skin .plugins .active th{background:#f1f2f5;}
+.polar-admin-skin .plugins .active th.check-column{border-left-color:var(--pa-accent);}
+
+/* ShanYing workspace: navigation rail, roomy canvas, rounded surfaces. */
+body.wp-admin.polar-admin-skin{--pa-sidebar:224px;--pa-radius:18px;--pa-control:9px;--pa-bg:#f1f2f5;--pa-shadow:0 8px 28px rgb(25 28 40 / .04);}
+body.polar-admin-skin #wpadminbar{height:32px;box-shadow:none;}
+body.polar-admin-skin #adminmenuback{width:var(--pa-sidebar);background:var(--pa-bg);border:0;}
+body.polar-admin-skin #adminmenuwrap{width:var(--pa-sidebar);background:transparent;padding:18px 12px;box-sizing:border-box;}
+body.polar-admin-skin #adminmenu{width:100%;margin:0;background:transparent;}
+body.polar-admin-skin #adminmenu a.menu-top{min-height:44px;display:flex;align-items:center;border-radius:11px;padding:0 8px;box-sizing:border-box;}
+body.polar-admin-skin #adminmenu div.wp-menu-name{font-size:14px;font-weight:500;padding:12px 0;}
+body.polar-admin-skin #adminmenu div.wp-menu-image{flex:0 0 34px;}
+body.polar-admin-skin #adminmenu li.menu-top{margin-bottom:5px;border-radius:11px;}
+body.polar-admin-skin #adminmenu :is(li.current,li.wp-has-current-submenu)>a.menu-top{background:var(--pa-accent);color:#fff;box-shadow:0 5px 12px rgb(0 82 217 / .15);}
+body.polar-admin-skin #adminmenu :is(li.current,li.wp-has-current-submenu)>a.menu-top:hover{background:#0048bf;color:#fff;box-shadow:none;}
+body.polar-admin-skin #adminmenu :is(li.current,li.wp-has-current-submenu)>a .wp-menu-image::before{color:#fff;}
+body.polar-admin-skin ul#adminmenu a.wp-has-current-submenu::after,body.polar-admin-skin ul#adminmenu>li.current>a.current::after{display:none;}
+body.polar-admin-skin #adminmenu .wp-submenu{border-radius:12px;background:var(--pa-paper);padding:8px;box-sizing:border-box;min-width:200px;box-shadow:var(--pa-shadow);}
+body.polar-admin-skin #adminmenu .wp-has-current-submenu .wp-submenu{margin:6px 0 10px;box-shadow:none;}
+body.polar-admin-skin #adminmenu .wp-submenu a{border-radius:7px;padding:8px 12px;}
+body.polar-admin-skin #adminmenu .wp-submenu li.current a{background:#f1f2f5;}
+body.polar-admin-skin #adminmenu .wp-menu-separator{height:12px;}
+body.polar-admin-skin #wpcontent,body.polar-admin-skin #wpfooter{margin-left:var(--pa-sidebar);}
+body.polar-admin-skin #wpcontent{padding-left:12px;}
+body.polar-admin-skin #wpbody-content>.wrap{margin:24px 28px 24px 0;padding:28px 30px;background:var(--pa-paper);border:1px solid var(--pa-line);border-radius:24px;box-shadow:var(--pa-shadow);box-sizing:border-box;}
+body.polar-admin-skin .wrap>h1{font-size:27px;font-weight:650;letter-spacing:-.6px;line-height:1.4;margin:0 0 20px;padding:0 0 18px;border-bottom:1px solid var(--pa-line);}
+body.polar-admin-skin .wrap .page-title-action{display:inline-flex;align-items:center;min-height:32px;padding:0 12px;top:0;margin-bottom:16px;border-radius:var(--pa-control);border-color:var(--pa-line);background:#f1f2f5;color:var(--pa-accent);}
+body.polar-admin-skin .wrap .subsubsub{margin:8px 0 16px;}
+body.polar-admin-skin .wrap .search-box{margin-bottom:16px;}
+body.polar-admin-skin .tablenav{height:auto;min-height:40px;margin:10px 0;}
+body.polar-admin-skin .tablenav .actions{padding-bottom:8px;}
+body.polar-admin-skin .wp-list-table{border-radius:12px;border-collapse:separate;border-spacing:0;overflow:hidden;}
+body.polar-admin-skin .wp-list-table :is(td,th){border-bottom:1px solid var(--pa-line);}
+body.polar-admin-skin .wp-list-table tbody tr:last-child :is(td,th){border-bottom:0;}
+body.polar-admin-skin .wp-list-table tbody tr:hover{background:#f6f7fa;}
+body.polar-admin-skin .wp-list-table .row-title{font-size:14px;}
+body.polar-admin-skin .wp-list-table .row-actions{padding-top:6px;}
+body.polar-admin-skin :is(.postbox,.stuffbox,.card,.welcome-panel){border-radius:var(--pa-radius);box-shadow:none;}
+body.polar-admin-skin .postbox-header{border-radius:var(--pa-radius) var(--pa-radius) 0 0;background:#fff;padding:5px 8px;}
+body.polar-admin-skin .postbox .inside{padding:0 18px 14px;}
+body.polar-admin-skin .notice{border-radius:10px;padding:5px 14px;}
+body.wp-core-ui.polar-admin-skin .button{border-radius:var(--pa-control);min-height:34px;padding:0 13px;line-height:32px;font-weight:500;}
+body.polar-admin-skin #wpbody-content input:is([type=text],[type=email],[type=url],[type=search],[type=number],[type=password]),body.polar-admin-skin #wpbody-content select,body.polar-admin-skin #wpbody-content textarea{border-radius:var(--pa-control);box-sizing:border-box;padding:0 11px;height:36px;min-height:36px;line-height:normal;}
+body.polar-admin-skin #wpbody-content select{padding-right:30px;}
+body.polar-admin-skin .form-table th{padding-top:23px;}
+body.polar-admin-skin .nav-tab{border-radius:9px 9px 0 0;padding:9px 16px;}
+body.polar-admin-skin .feng-admin .feng-settings-section,body.polar-admin-skin .feng-admin-save{border-radius:var(--pa-radius);}
+body.polar-admin-skin .feng-admin .feng-admin-tabs .nav-tab{border-radius:10px;}
+body.polar-admin-skin .feng-admin .feng-admin-header{padding-top:0;}
+body.polar-admin-skin .feng-admin-shell{grid-template-columns:170px minmax(0,1fr);gap:20px;}
+body.polar-admin-skin #titlediv #title{height:auto;font-size:24px;padding:14px 16px;}
+body.polar-admin-skin #titlediv #title-prompt-text{padding:17px;font-size:22px;}
+body.polar-admin-skin #postdivrich{border-radius:12px;overflow:hidden;border:1px solid var(--pa-line);}
+body.polar-admin-skin .media-modal-content{border-radius:18px;overflow:hidden;}
+body.polar-admin-skin .theme-browser .theme{border-radius:14px;overflow:hidden;}
+body.polar-admin-skin #wpfooter{padding:16px 32px;color:var(--pa-muted);}
+/* Preserve native collapsed navigation and full-screen block editor geometry. */
+body.polar-admin-skin.folded{--pa-sidebar:60px;}
+body.polar-admin-skin.folded #adminmenuwrap{padding:18px 8px;}
+body.polar-admin-skin.folded #adminmenu a.menu-top{padding:0;}
+body.polar-admin-skin.folded #adminmenu div.wp-menu-image{width:44px;flex-basis:44px;}
+body.polar-admin-skin.folded #adminmenu .wp-submenu{left:44px;}
+body.polar-admin-skin.is-fullscreen-mode #wpcontent{margin-left:0;padding-left:0;}
+body.polar-admin-skin.block-editor-page #wpbody-content>.wrap{margin:0;padding:0;border:0;border-radius:0;box-shadow:none;}
+@media(min-width:961px){body.polar-admin-skin:not(.folded) #adminmenu .wp-not-current-submenu .wp-submenu{left:200px;}body.polar-admin-skin #col-container{display:grid;grid-template-columns:minmax(240px,1fr) minmax(0,2fr);gap:28px;}body.polar-admin-skin #col-left,body.polar-admin-skin #col-right{float:none;width:auto;}body.polar-admin-skin #col-container .col-wrap{padding:0;}}
+@media(min-width:783px) and (max-width:960px){body.polar-admin-skin.auto-fold{--pa-sidebar:60px;}body.polar-admin-skin.auto-fold #adminmenuwrap{padding:18px 8px;}body.polar-admin-skin.auto-fold #adminmenu a.menu-top{padding:0;}body.polar-admin-skin.auto-fold #adminmenu .wp-submenu{left:44px;}}
+@media(max-width:1100px){body.polar-admin-skin #wpbody-content>.wrap{margin-right:16px;padding:22px;}body.polar-admin-skin .feng-admin-shell{grid-template-columns:1fr;}body.polar-admin-skin .feng-admin .feng-admin-tabs{position:static;flex-direction:row;flex-wrap:wrap;}}
+@media(max-width:782px){body.polar-admin-skin{--pa-sidebar:190px;}body.polar-admin-skin #wpadminbar{height:46px;}body.polar-admin-skin #wpcontent,body.polar-admin-skin #wpfooter{margin-left:0;}body.polar-admin-skin #wpcontent{padding-left:10px;}body.polar-admin-skin #wpbody-content>.wrap{margin:12px 10px 16px 0;padding:18px 14px;border-radius:16px;}body.polar-admin-skin #adminmenuwrap{padding:8px;}body.polar-admin-skin #adminmenu a.menu-top{display:block;}body.polar-admin-skin .wrap>h1{font-size:23px;}body.polar-admin-skin .media-modal-content{border-radius:0;}}
+
+/* Complete native menu hover/focus overrides; keep flyouts attached to their trigger. */
+body.polar-admin-skin #adminmenu li.wp-has-submenu::after{display:none!important;}
+body.polar-admin-skin #adminmenu a:is(:hover,:focus){box-shadow:none;border-radius:9px;}
+body.polar-admin-skin #adminmenu a:focus-visible{outline:2px solid var(--pa-accent);outline-offset:-2px;}
+body.polar-admin-skin #adminmenu li.menu-top:is(:hover,.opensub){background:transparent;}
+body.polar-admin-skin #adminmenu li.wp-not-current-submenu>a.menu-top:is(:hover,:focus),
+body.polar-admin-skin #adminmenu li.wp-not-current-submenu.opensub>a.menu-top{background:#e5e9f2;color:var(--pa-accent);border-radius:11px;}
+body.polar-admin-skin #adminmenu .wp-submenu{border:1px solid var(--pa-line);box-shadow:0 12px 32px rgb(25 28 40 / .12);}
+body.polar-admin-skin #adminmenu .wp-submenu a:is(:hover,:focus){background:#f1f2f5;color:var(--pa-accent);box-shadow:none;border-radius:7px;}
+body.polar-admin-skin:not(.folded) #adminmenu .wp-has-current-submenu .wp-submenu{background:transparent;border:0;padding:5px 8px 5px 30px;margin:4px 0 6px;box-shadow:none;}
+body.polar-admin-skin #adminmenu .wp-submenu li.current a{background:#e5e9f2;}
+body.polar-admin-skin #adminmenu .wp-submenu .wp-submenu-head{color:var(--pa-text);background:transparent;}
+body.polar-admin-skin #adminmenu .wp-menu-separator{height:5px;margin:0;}
+/* Toolbar and account flyout share the workspace surfaces. */
+body.polar-admin-skin #wpadminbar{padding:0 12px;box-sizing:border-box;background:#fff;border-bottom:1px solid var(--pa-line);}
+body.polar-admin-skin #wpadminbar .quicklinks>ul>li>.ab-item{padding-inline:10px;border-radius:6px;}
+body.polar-admin-skin #wpadminbar .quicklinks>ul>li:is(:hover,.hover)>.ab-item,
+body.polar-admin-skin #wpadminbar .quicklinks>ul>li>.ab-item:focus{background:#f1f2f5;color:var(--pa-accent);}
+body.polar-admin-skin #wpadminbar .ab-top-menu>li:is(:hover,.hover)>.ab-item :is(.ab-label,.ab-icon::before){color:var(--pa-accent);}
+body.polar-admin-skin #wpadminbar .ab-sub-wrapper{border:1px solid var(--pa-line);border-radius:12px;padding:6px;box-shadow:0 12px 32px rgb(25 28 40 / .12);}
+body.polar-admin-skin #wpadminbar .ab-submenu{padding:4px 0;}
+body.polar-admin-skin #wpadminbar .ab-submenu .ab-item{border-radius:6px;color:var(--pa-text);}
+body.polar-admin-skin #wpadminbar #wp-admin-bar-user-actions{margin:0;padding:8px;}
+body.polar-admin-skin #wpadminbar #wp-admin-bar-user-info{margin-bottom:8px;}
+body.polar-admin-skin #wpadminbar #wp-admin-bar-user-info .avatar{border:0;border-radius:50%;}
+body.polar-admin-skin #wpadminbar #wp-admin-bar-my-account.with-avatar>.ab-empty-item img,
+body.polar-admin-skin #wpadminbar #wp-admin-bar-my-account.with-avatar>a img{border:0;border-radius:50%;}
+/* Screen controls occupy their own row instead of hanging over the content card. */
+body.polar-admin-skin #screen-meta-links{float:none;display:flex;justify-content:flex-end;gap:8px;margin:14px 28px 0 0;}
+body.polar-admin-skin #screen-meta-links .screen-meta-toggle{float:none;margin:0;}
+body.polar-admin-skin #screen-meta-links .show-settings{border:1px solid var(--pa-line);border-radius:8px;background:#fff;color:var(--pa-muted);padding:4px 10px 4px 14px;line-height:24px;box-shadow:none;}
+body.polar-admin-skin #screen-meta-links .show-settings:is(:hover,:focus,.screen-meta-active){background:#fff;color:var(--pa-accent);border-color:var(--pa-accent);}
+body.polar-admin-skin #screen-meta-links .show-settings:focus-visible{outline:2px solid var(--pa-accent);outline-offset:2px;}
+body.polar-admin-skin #screen-meta{margin:14px 28px 0 0;border:1px solid var(--pa-line);border-radius:14px;box-shadow:none;overflow:hidden;}
+body.polar-admin-skin #screen-options-wrap,body.polar-admin-skin #contextual-help-wrap{padding:16px 20px;}
+body.polar-admin-skin #contextual-help-back{background:#fafafa;border-color:var(--pa-line);}
+body.polar-admin-skin .contextual-help-tabs .active{background:#f1f2f5;border-left-color:var(--pa-accent);}
+body.polar-admin-skin #screen-meta-links:empty{display:none;}
+@media(min-width:783px) and (max-width:960px){body.polar-admin-skin.auto-fold #adminmenu .wp-has-current-submenu .wp-submenu{background:#fff;border:1px solid var(--pa-line);padding:8px;margin:0;box-shadow:0 12px 32px rgb(25 28 40 / .12);}}
+@media(max-width:782px){body.polar-admin-skin #wpadminbar{padding:0;}body.polar-admin-skin #screen-meta-links{margin:10px 10px 0 0;}body.polar-admin-skin #screen-meta{margin:10px 10px 0 0;}body.polar-admin-skin #screen-meta-links .show-settings{padding:4px 8px;}}
+
+/* List actions: consistent sizing and a compact search/filter toolbar. */
+body.wp-core-ui.polar-admin-skin :is(.button,.button-primary,.button-secondary),
+body.polar-admin-skin #wpbody-content .search-box input[type=search],
+body.polar-admin-skin #wpbody-content .tablenav select{box-sizing:border-box;height:36px;min-height:36px;line-height:34px;padding:0 12px;margin-top:0;margin-bottom:0;vertical-align:middle;border-radius:8px;font-size:13px;}
+body.polar-admin-skin #wpbody-content .tablenav select{padding-right:32px;max-width:240px;}
+body.polar-admin-skin #wpbody-content .search-box input[type=search]{width:220px;max-width:100%;background:#fafafa;}
+body.polar-admin-skin #wpbody-content .search-box .button{background:var(--pa-accent);border-color:var(--pa-accent);color:#fff;}
+body.polar-admin-skin #wpbody-content .search-box .button:hover{background:#0048bf;border-color:#0048bf;}
+body.polar-admin-skin .wrap .search-box{display:flex;align-items:center;gap:8px;margin:0 0 12px 16px;float:right;}
+body.polar-admin-skin .wrap .search-box input{float:none;margin:0;}
+body.polar-admin-skin .tablenav.top{clear:none;min-height:36px;margin:0 0 14px;padding:0;}
+body.polar-admin-skin .tablenav .actions{display:flex;align-items:center;gap:8px;padding:0;margin:0 16px 10px 0;}
+body.polar-admin-skin .tablenav .actions :is(select,input,.button){float:none;margin:0;}
+body.polar-admin-skin .tablenav.bottom{margin-top:14px;}
+body.polar-admin-skin .tablenav .tablenav-pages{margin:0 0 10px;line-height:36px;}
+body.polar-admin-skin .tablenav-pages .pagination-links :is(a,span.button){box-sizing:border-box;min-width:36px;height:36px;line-height:34px;padding:0 8px;border-radius:8px;border:1px solid var(--pa-line);background:#fafafa;}
+body.polar-admin-skin #wpbody-content .tablenav-pages input.current-page{box-sizing:border-box;height:36px;min-height:36px;padding:0 6px;}
+body.polar-admin-skin .wrap>h1.wp-heading-inline{display:inline-block;border:0;padding:0;margin:0 12px 20px 0;vertical-align:middle;}
+body.polar-admin-skin .wrap>.page-title-action{margin:0 0 20px;vertical-align:middle;height:36px;min-height:36px;box-sizing:border-box;line-height:34px;padding:0 12px;}
+body.polar-admin-skin .wrap>.wp-header-end{visibility:visible;border:0;border-top:1px solid var(--pa-line);margin:0 0 20px;clear:both;}
+body.polar-admin-skin .wp-list-table{clear:both;}
+@media(max-width:1100px){body.polar-admin-skin .wrap .search-box{float:none;justify-content:flex-end;margin:0 0 12px;}body.polar-admin-skin .tablenav.top{clear:both;}}
+@media(max-width:782px){body.polar-admin-skin .wrap .search-box{position:static;display:flex;height:auto;width:100%;justify-content:stretch;margin:12px 0;}body.polar-admin-skin #wpbody-content .search-box input[type=search]{flex:1;min-width:0;width:auto;}body.polar-admin-skin .search-box .button{flex-shrink:0;}body.polar-admin-skin .tablenav .actions{flex-wrap:wrap;}body.polar-admin-skin .tablenav .actions:not(.bulkactions){display:none;}body.polar-admin-skin .tablenav-pages .pagination-links{display:inline-block;}}
+
+/* Shared control dimensions, including media frames outside #wpbody-content. */
+body.polar-admin-skin{--pa-control-height:36px;}
+body.polar-admin-skin #wpbody-content select:not([multiple]):not([size]),
+body.polar-admin-skin .media-frame select:not([multiple]):not([size]),
+body.polar-admin-skin .media-frame input:is([type=search],[type=text],[type=url]),
+body.wp-core-ui.polar-admin-skin .media-frame .button{box-sizing:border-box;height:var(--pa-control-height);min-height:var(--pa-control-height);padding:0 12px;line-height:normal;font-size:13px;vertical-align:middle;border-radius:8px;}
+body.polar-admin-skin #wpbody-content select:not([multiple]):not([size]),
+body.polar-admin-skin .media-frame select:not([multiple]):not([size]){padding-right:32px;}
+body.polar-admin-skin #wpbody-content textarea{height:auto;min-height:90px;padding:9px 11px;line-height:1.6;}
+body.polar-admin-skin #wpbody-content select:is([multiple],[size]){height:auto;min-height:72px;padding:6px;}
+body.polar-admin-skin .media-frame.mode-grid .media-toolbar-secondary{align-items:center;gap:8px;}
+body.polar-admin-skin .media-frame.mode-grid .media-toolbar-secondary>select,
+body.polar-admin-skin .media-frame.mode-grid .media-toolbar-secondary>.button{margin:0;flex-shrink:0;}
+body.polar-admin-skin .media-frame.mode-grid .media-toolbar-secondary>.select-mode-toggle-button{height:var(--pa-control-height);min-height:var(--pa-control-height);margin:0;}
+body.polar-admin-skin .media-frame.mode-grid .view-switch{display:flex;align-items:center;height:var(--pa-control-height);margin:0 8px 0 0;padding:0;}
+body.polar-admin-skin .media-frame.mode-grid .media-toolbar-primary{align-items:center;}
+
+/* ShanYing night palette: scoped to admin chrome, not the article canvas. */
+body.wp-admin.polar-admin-skin{color-scheme:dark;--pa-bg:#101113;--pa-paper:#191b1f;--pa-line:#303339;--pa-text:#eceef1;--pa-muted:#a0a5af;--pa-accent:#90ff3a;--pa-shadow:0 10px 30px #0003;--wp-admin-theme-color:#90ff3a;--wp-admin-theme-color--rgb:144,255,58;--wp-admin-theme-color-darker-10:#7de32d;--wp-admin-theme-color-darker-20:#6ac625;}
+body.polar-admin-skin #wpbody-content>.wrap,
+body.polar-admin-skin #wpadminbar,
+body.polar-admin-skin #wpadminbar .ab-sub-wrapper,
+body.polar-admin-skin #adminmenu .wp-submenu,
+body.polar-admin-skin .postbox-header,
+body.polar-admin-skin .notice,
+body.polar-admin-skin #screen-meta,
+body.polar-admin-skin .feng-admin :is(.feng-settings-section,.feng-admin-save){background:var(--pa-paper);color:var(--pa-text);border-color:var(--pa-line);}
+body.polar-admin-skin #wpbody a:hover{color:#b0ff79;}
+body.polar-admin-skin #wpbody :is(.submitdelete,.trash a){color:#ff8585;}
+body.polar-admin-skin #wpbody-content :is(input[type=text],input[type=search],input[type=email],input[type=url],input[type=number],input[type=password],textarea,select),
+body.polar-admin-skin .media-frame :is(input,select,textarea){background-color:#121417;color:var(--pa-text);border-color:#3b3f47;}
+body.wp-core-ui.polar-admin-skin .button,
+body.polar-admin-skin #screen-meta-links .show-settings,
+body.polar-admin-skin .wrap>.page-title-action{background:#25282e;color:var(--pa-text);border-color:#3b3f47;}
+body.wp-core-ui.polar-admin-skin .button:is(:hover,:focus),
+body.polar-admin-skin #screen-meta-links .show-settings:is(:hover,:focus){background:#30343b;color:var(--pa-accent);border-color:var(--pa-accent);}
+body.wp-core-ui.polar-admin-skin .button-primary,
+body.polar-admin-skin #wpbody-content .search-box .button,
+body.polar-admin-skin #adminmenu :is(li.current,li.wp-has-current-submenu)>a.menu-top,
+body.polar-admin-skin .theme-browser .theme.active .theme-name{background:var(--pa-accent);color:#102006;border-color:var(--pa-accent);box-shadow:none;}
+body.wp-core-ui.polar-admin-skin .button-primary:is(:hover,:focus),
+body.polar-admin-skin #wpbody-content .search-box .button:hover,
+body.polar-admin-skin #adminmenu :is(li.current,li.wp-has-current-submenu)>a.menu-top:hover{background:#a7ff65;color:#102006;border-color:#a7ff65;}
+body.polar-admin-skin #adminmenu :is(li.current,li.wp-has-current-submenu)>a .wp-menu-image::before{color:#102006;}
+body.polar-admin-skin #adminmenu li.wp-not-current-submenu>a.menu-top:is(:hover,:focus),
+body.polar-admin-skin #adminmenu li.wp-not-current-submenu.opensub>a.menu-top,
+body.polar-admin-skin #adminmenu .wp-submenu a:is(:hover,:focus),
+body.polar-admin-skin #adminmenu .wp-submenu li.current a{background:#292e26;color:var(--pa-accent);}
+body.polar-admin-skin #wpadminbar .quicklinks>ul>li:is(:hover,.hover)>.ab-item,
+body.polar-admin-skin #wpadminbar .quicklinks>ul>li>.ab-item:focus,
+body.polar-admin-skin #wpadminbar .quicklinks .menupop ul li a:is(:hover,:focus),
+body.polar-admin-skin #wpadminbar .quicklinks .menupop.hover ul li a:is(:hover,:focus){background:#292e26;color:var(--pa-accent);}
+body.polar-admin-skin :is(.widefat thead,.widefat tfoot) :is(td,th),
+body.polar-admin-skin .striped>tbody>:nth-child(odd),
+body.polar-admin-skin .plugins .active :is(td,th),
+body.polar-admin-skin .plugin-update-tr.active td{background:#202328;}
+body.polar-admin-skin .wp-list-table tbody tr:hover{background:#282c32;}
+body.polar-admin-skin .widefat :is(td,th),body.polar-admin-skin .widefat p{color:var(--pa-text);}
+body.polar-admin-skin :is(.nav-tab,.feng-native-links,#contextual-help-back){background:#22252a;color:var(--pa-muted);border-color:var(--pa-line);}
+body.polar-admin-skin .nav-tab-active,
+body.polar-admin-skin .feng-admin .feng-admin-tabs .nav-tab:is(:hover,.nav-tab-active),
+body.polar-admin-skin .contextual-help-tabs .active{background:#292e26;color:var(--pa-accent);}
+body.polar-admin-skin .tablenav-pages .pagination-links :is(a,span.button){background:#25282e;color:var(--pa-text);border-color:var(--pa-line);}
+body.wp-core-ui.polar-admin-skin .button:disabled,body.wp-core-ui.polar-admin-skin .button.disabled{background:#202226!important;color:#747983!important;border-color:var(--pa-line)!important;}
+body.polar-admin-skin .media-modal-content,
+body.polar-admin-skin .media-frame :is(.media-frame-content,.media-frame-title,.media-frame-router,.media-frame-toolbar,.media-sidebar,.media-toolbar,.attachment-info),
+body.polar-admin-skin .theme-browser .theme .theme-name{background:var(--pa-paper);color:var(--pa-text);border-color:var(--pa-line);}
+body.polar-admin-skin .media-frame :is(h1,h2,h3,label,.setting span,.description,.attachment-details){color:var(--pa-text);}
+body.polar-admin-skin .media-frame .attachment.details{box-shadow:inset 0 0 0 3px var(--pa-paper),inset 0 0 0 7px var(--pa-accent);}
+body.polar-admin-skin #wpbody input[type=checkbox]:checked::before{filter:grayscale(1) brightness(2.5);}
+body.polar-admin-skin .feng-admin :is(.feng-section-header,.feng-settings-section,.feng-admin-save){border-color:var(--pa-line);}
+body.polar-admin-skin #major-publishing-actions,
+body.polar-admin-skin .wp-editor-tools,
+body.polar-admin-skin .quicktags-toolbar{background:#22252a;color:var(--pa-text);border-color:var(--pa-line);}
+/* Preserve readable authored content inside the block editor. */
+body.polar-admin-skin .editor-styles-wrapper{color-scheme:light;}
+
+/* Post status and timestamp share one compact date cell on desktop. */
+@media(min-width:783px){
+ body.polar-admin-skin.edit-php .wp-list-table .column-date{width:250px;white-space:nowrap;}
+ body.polar-admin-skin.edit-php .wp-list-table td.column-date br{display:none;}
+ body.polar-admin-skin.edit-php .wp-list-table td.column-date{word-spacing:2px;}
+ body.polar-admin-skin.edit-php .wp-list-table tbody td{padding-top:10px;padding-bottom:10px;vertical-align:middle;}
+}
+@media(min-width:783px){body.polar-admin-skin.edit-php .polar-date-status{margin-right:8px;color:var(--pa-muted);}}

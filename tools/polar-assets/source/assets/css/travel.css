@@ -53,7 +53,7 @@ body.admin-bar .feng-travel-world[data-travel-fullscreen]{top:32px;height:calc(1
 @media(max-width:782px){body.admin-bar .feng-travel-world[data-travel-fullscreen]{top:46px;height:calc(100dvh - 46px);}}
 
 /* Override the generic integrated-page card shell for the map route. */
-#xf-view.feng-integrated-page:has([data-travel-page])>.xf-header{position:fixed;top:18px;left:50%;transform:translateX(-50%);width:min(var(--xf-frame),calc(100% - 48px));margin:0;padding:9px 20px;min-height:62px;background:transparent;border:0;border-radius:0;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;}
+#xf-view.feng-integrated-page:has([data-travel-page])>.xf-header{background:transparent;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;border-color:transparent;}
 #xf-view.feng-integrated-page:has([data-travel-page])>.xf-header::after{display:none;}
 #xf-view.feng-integrated-page:has([data-travel-page])>#xf-content{padding:0;border:0;border-radius:0;background:transparent;}
 #xf-view:has([data-travel-fullscreen]) .feng-travel-world{left:0;right:0;margin-left:0;width:100vw;}
@@ -62,9 +62,9 @@ body.admin-bar .feng-travel-world[data-travel-fullscreen]{top:32px;height:calc(1
 .feng-map-control .feng-map-settings{top:calc(100% + 12px);right:0;width:260px;max-width:calc(100vw - 32px);box-sizing:border-box;text-align:left;text-shadow:none;}
 .feng-map-control .feng-map-settings label{display:grid;}
 .feng-map-control .feng-map-settings label[hidden]{display:none;}
-@media(max-width:700px){#xf-view.feng-integrated-page:has([data-travel-page])>.xf-header{top:10px;width:calc(100% - 24px);padding:10px 13px;}.feng-map-control .feng-map-settings{right:-120px;}}
-body.admin-bar #xf-view.feng-integrated-page:has([data-travel-page])>.xf-header{top:50px;}
-@media(max-width:782px){body.admin-bar #xf-view.feng-integrated-page:has([data-travel-page])>.xf-header{top:56px;}}
+@media(max-width:700px){.feng-map-control .feng-map-settings{right:-120px;}}
+
+
 
 /* One compact map dock, with the footprint count opposite it. */
 .feng-travel-world .feng-travel-world-heading{top:auto;bottom:70px;left:28px;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;pointer-events:none;}

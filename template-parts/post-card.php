@@ -1,5 +1,5 @@
 <?php
-/** Full-image article card with an image-derived caption color. @package Polar */
+/** Full-image article card with an image-derived caption color. @package ShanYing */
 if(!defined('ABSPATH')) exit;
 $entry=get_post($args['post'] ?? null);
 if(!$entry) return;

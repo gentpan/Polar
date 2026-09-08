@@ -1,24 +1,24 @@
-<p align="center"><img src="assets/images/brand/polar-icon.png" width="96" alt="Polar 极地"></p>
-<h1 align="center">Polar · 极地</h1>
+<p align="center"><img src="assets/images/brand/polar-icon.png" width="96" alt="ShanYing 山映"></p>
+<h1 align="center">山映 · ShanYing</h1>
 <p align="center">记录生活，自有光芒。</p>
 <p align="center">
-  <a href="https://github.com/gentpan/Polar/blob/main/style.css"><img src="https://img.shields.io/badge/Polar-0.5.2-0755e9?style=flat-square" alt="Polar 0.5.2"></a>
+  <a href="https://github.com/gentpan/ShanYing/blob/main/style.css"><img src="https://img.shields.io/badge/ShanYing-0.5.2-0755e9?style=flat-square" alt="ShanYing 0.5.2"></a>
   <a href="https://wordpress.org/"><img src="https://img.shields.io/badge/WordPress-6.6%2B-21759B?style=flat-square&amp;logo=wordpress&amp;logoColor=white" alt="WordPress 6.6+"></a>
   <a href="https://www.php.net/"><img src="https://img.shields.io/badge/PHP-7.4%2B-777BB4?style=flat-square&amp;logo=php&amp;logoColor=white" alt="PHP 7.4+"></a>
   <a href="https://www.gnu.org/licenses/old-licenses/gpl-2.0.html"><img src="https://img.shields.io/badge/License-GPL--2.0--or--later-3b805a?style=flat-square" alt="License GPL-2.0-or-later"></a>
   <a href="https://xifeng.net"><img src="https://img.shields.io/badge/Website-xifeng.net-0755e9?style=flat-square" alt="Website xifeng.net"></a>
-  <a href="https://github.com/gentpan/Polar/stargazers"><img src="https://img.shields.io/github/stars/gentpan/Polar?style=flat-square&amp;logo=github" alt="GitHub stars"></a>
+  <a href="https://github.com/gentpan/ShanYing/stargazers"><img src="https://img.shields.io/github/stars/gentpan/ShanYing?style=flat-square&amp;logo=github" alt="GitHub stars"></a>
 </p>
 
 <p align="center"><a href="https://xifeng.net">作者网站 · xifeng.net</a></p>
 
-极地是一款面向个人博客的 WordPress 主题，以清晰的内容层级、蓝色点缀和深浅配色，呈现文章、说说、旅行足迹与朋友之间的互动。
+山映是一款以山水光影与生活记录为灵感的 WordPress 个人博客主题，融合随访客时间与天气变化的首页、文章分类浏览、说说、旅行足迹、博友互动与头像游戏。支持深浅配色和自定义后台外观，基于 PHP、JavaScript 与 CSS，局部交互使用 React、Motion 和 Lottie。
 
 > 当前版本：0.5.2，持续开发中。请在测试站验证后再用于生产站点。
 
 ## 主题预览
 
-![Polar 极地主题概念预览](screenshot.png)
+![ShanYing 山映主题概念预览](screenshot.png)
 
 上图为主题设计概念图，并非当前运行网站的实拍截图；具体页面以实际安装效果为准。
 
@@ -29,7 +29,7 @@
 - **说说**：独立便签式记录页面，管理员发布、编辑与图片管理。
 - **旅行足迹**：文章独立勾选收录，地点坐标与旅行日期；全屏地图、平面 / 立体 / 地球视图、多种 Mapbox 风格与地球背景设置。
 - **朋友与评论**：友链动态、评论等级、系统与浏览器标识、评论回复与限时自助编辑。
-- **个性化互动**：季节页脚、音乐播放器、宠物陪伴、自定义右键菜单、可配置 AI 功能。
+- **个性化互动**：山水天气 Hero、真实月相、音乐播放器、宠物陪伴、自定义右键菜单、可配置 AI 功能。
 - **主题设置**：后台集中配置，原生 WordPress 菜单、分类、标签和媒体库管理。
 
 ## 技术栈
@@ -47,9 +47,9 @@
 
 ## 安装与配置
 
-1. 将主题目录放到 WordPress 的 `wp-content/themes/polar/`。
-2. 在「外观 → 主题」启用 **Polar · 极地**。
-3. 在「外观 → Polar 设置」配置主题；在「外观 → 菜单」配置导航。
+1. 将主题目录放到 WordPress 的 `wp-content/themes/shanying/`。
+2. 在「外观 → 主题」启用 **山映 · ShanYing**。
+3. 在「外观 → ShanYing 设置」配置主题；在「外观 → 菜单」配置导航。
 4. 创建名为「足迹」的页面，选择「足迹地图」模板，并加入导航菜单。
 5. 在文章编辑页的「旅行足迹」中勾选收录，填写地点或坐标、旅行日期。
 6. 如使用地图与 AI 等服务，在后台填写自己的服务配置。
@@ -59,19 +59,20 @@
 ## 目录
 
 ```text
-polar/
+shanying/
 ├── assets/          已构建的样式、脚本与品牌资源
 ├── inc/             PHP 功能模块
 ├── pages/           自定义页面模板
 ├── template-parts/  可复用页面片段
+├── ai/              AI 目录说明
+├── docs/            功能文档
 ├── style.css        WordPress 主题元数据
 └── screenshot.png   WordPress 后台主题预览
 ```
 
-开发源文件位于本仓库的 `tools/polar-assets/`，不要仅修改生成后的 main.css / main.js。构建与检查命令（在仓库根目录运行）：
+开发源文件当前位于上层工作区的 `tools/polar-assets/`，不要仅修改生成后的 main.css / main.js。构建与检查命令（在原工作区根目录运行）：
 
 ```sh
-npm ci --prefix tools/polar-assets/lucide-motion
 python3 tools/polar-assets/build.py
 python3 tools/polar-assets/audit.py
 ```
@@ -79,7 +80,3 @@ python3 tools/polar-assets/audit.py
 ## 作者与许可
 
 由 [西风](https://xifeng.net) 设计与开发。主题 style.css 声明 GPL-2.0-or-later；第三方字体、图标、动画和其他资源遵循各自许可证，相关说明保留于资源目录。主题预览与品牌图标由 AI 辅助生成。
-
-## 仓库范围
-
-仓库保留主题代码、构建源码、README、AGENTS.md 和第三方资源许可。内部 docs、AI 维护说明、本地 WordPress 数据库、上传文件、密钥、运行缓存及 node_modules 不同步。当前运行时 AI 提示词仍在 PHP 模块中。

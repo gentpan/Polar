@@ -123,8 +123,8 @@ body.admin-bar:has(.feng-travel-world):has(#feng-dashboard:not([hidden])) .xf-si
 [data-feng-dashboard-content]>.feng-dash-section .feng-dash-categories{grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
 .feng-dash-friends{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 .feng-dash-friends a{display:flex;align-items:center;gap:8px;min-width:0;font-size:12px}
-.feng-dash-friends img,.feng-dash-friend-initial{width:28px;height:28px;border-radius:50%;object-fit:cover;flex-shrink:0}
-.feng-dash-friend-initial{display:grid;place-items:center;background:var(--xf-soft);color:var(--xf-muted)}
+.feng-dash-friends img,.feng-dash-friend-avatar{width:28px;height:28px;border-radius:50%;object-fit:cover;flex-shrink:0}
+.feng-dash-friend-avatar{display:grid;place-items:center;background:var(--xf-soft);color:var(--xf-muted)}
 .feng-dash-friends a>span:last-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 .feng-dashboard-head>[data-dashboard-summary-slot]{flex:1;max-width:560px;margin-left:auto;align-self:center;min-width:0}
@@ -133,3 +133,5 @@ body.admin-bar:has(.feng-travel-world):has(#feng-dashboard:not([hidden])) .xf-si
 .feng-dashboard-summary strong{font-size:19px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.4}
 .feng-dashboard-summary span{font-size:10px;color:var(--xf-muted)}
 @media(max-width:800px){.feng-dashboard-head{flex-wrap:wrap}.feng-dashboard-head>[data-dashboard-summary-slot]{order:3;flex-basis:100%;max-width:none;margin:0}.feng-dashboard-head>[data-feng-dashboard-close]{margin-left:auto}.feng-dashboard-summary{gap:12px;padding:16px}.feng-dashboard-summary strong{font-size:17px}}
+
+.feng-dash-friend-avatar{overflow:hidden;}.feng-dash-friend-avatar .feng-friend-avatar-initial{display:grid;place-items:center;width:28px;height:28px;}

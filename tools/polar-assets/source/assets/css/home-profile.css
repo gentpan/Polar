@@ -119,11 +119,11 @@
 
 /* Inline GitHub spark bars, like a tiny weekly activity signature. */
 .feng-mini-activity{gap:9px;flex-wrap:wrap;}.feng-mini-caption{font-size:13px;color:var(--xf-text);line-height:1.5;}.feng-mini-caption em{font-style:italic;color:var(--xf-muted);font-weight:400;}
-.feng-mini-bars{height:26px;gap:4px;padding:0 5px;border-inline:1px solid var(--xf-line);}
+.feng-mini-bars{height:26px;gap:4px;padding:0;border:0;}
 .feng-mini-bars>span{width:4px;border:0;position:relative;}.feng-mini-bars>span::after{content:"";position:absolute;inset:0 -2px;}
 .feng-mini-bars i{height:max(3px,var(--bar-height));border-radius:1px;background:var(--xf-accent);opacity:.85;}
 .feng-mini-bars>span:nth-child(even) i{opacity:.4;}.feng-mini-bars>span[data-count="0"] i{opacity:.18;}
-.feng-mini-bars>span:is(:hover,:focus-visible){outline:1px solid var(--xf-accent);outline-offset:2px;}.feng-mini-bars>span:is(:hover,:focus-visible) i{opacity:1;}
+
 
 .feng-profile-calendar{--heat-1:#bdd3c8;--heat-2:#89b49e;--heat-3:#588d70;--heat-4:#315d45;}
 .feng-profile-calendar [data-level="0"]{background:var(--heat-0);}.feng-profile-calendar [data-level="1"]{background:var(--heat-1);}.feng-profile-calendar [data-level="2"]{background:var(--heat-2);}.feng-profile-calendar [data-level="3"]{background:var(--heat-3);}.feng-profile-calendar [data-level="4"]{background:var(--heat-4);}
@@ -139,10 +139,10 @@
 
 /* Keep GitHub activity colors tied to the selected light/dark palette. */
 .feng-mini-bars{--github-activity-color:#0052D9;}
-:root[data-xf-theme="dark"] .feng-mini-bars{--github-activity-color:#90FF3A;}
-@media(prefers-color-scheme:dark){:root:not([data-xf-theme="light"]) .feng-mini-bars{--github-activity-color:#90FF3A;}}
+:root[data-xf-theme="dark"] .feng-mini-bars{--github-activity-color:#fff;}
+@media(prefers-color-scheme:dark){:root:not([data-xf-theme="light"]) .feng-mini-bars{--github-activity-color:#fff;}}
 .feng-mini-bars i{background:var(--github-activity-color);}
-.feng-mini-bars>span:is(:hover,:focus-visible){outline-color:var(--github-activity-color);}
+
 
 /* A smaller portrait group, with a little breathing room above the opened photos. */
 .feng-profile-visual .feng-photo-stack{transform:translateY(10px) scale(.85);transform-origin:center center;}
@@ -305,11 +305,11 @@
  #xf-view:has(> #xf-content:not([hidden]) > .feng-profile-hero) > .xf-header{border-top:0;border-radius:0;}
  #xf-view:has(> #xf-content:not([hidden]) > .feng-profile-hero) > .xf-footer.feng-footer-landscape{margin-bottom:0;min-height:clamp(76px,11.3svh,140px)!important;border-bottom:0;border-radius:24px 24px 0 0;}
 }
-/* Share spare desktop height with the article card, keeping both gaps equal. */
+/* Keep the article card at its content height with consistent outer spacing. */
 @media(min-width:1100px){
  #xf-view:has(> #xf-content:not([hidden]) > .feng-profile-hero){--feng-home-gap:clamp(12px,2svh,24px);}
  #xf-view:has(> #xf-content:not([hidden]) > .feng-profile-hero) > #xf-content{display:flex;flex-direction:column;}
- #xf-view:has(> #xf-content:not([hidden]) > .feng-profile-hero) .xf-collections.feng-article-hub{margin-top:var(--feng-home-gap);flex:1;}
+ #xf-view:has(> #xf-content:not([hidden]) > .feng-profile-hero) .xf-collections.feng-article-hub{margin-top:var(--feng-home-gap);flex:0 0 auto;}
  #xf-view:has(> #xf-content:not([hidden]) > .feng-profile-hero) > .xf-footer.feng-footer-landscape{margin-top:var(--feng-home-gap);}
 }
 /* Static pages share one navigation/content card; post pages keep a separate header. */
@@ -322,3 +322,48 @@
 #xf-view.feng-article-page>.xf-header{top:0;padding:18px 28px;min-height:74px;}
 @media(min-width:1100px) and (max-height:1000px){#xf-view:is(.feng-integrated-page,.feng-article-page)>.xf-header{min-height:56px;padding-block:10px;}}
 @media(max-width:700px){#xf-view.feng-integrated-page{padding-top:16px;}#xf-view.feng-integrated-page>.xf-header{padding:14px 20px;border-top:1px solid var(--xf-line);border-radius:22px 22px 0 0;}#xf-view.feng-integrated-page>#xf-content{padding-inline:20px;border-radius:0 0 22px 22px;}#xf-view.feng-article-page>.xf-header{padding:14px 20px;}}
+
+/* Fuji scenes: separate landscape, celestial light and weather layers. */
+.feng-profile-hero[data-smart-scene]{background:var(--xf-surface);transition:background 1.8s,color 1.8s;}
+.feng-profile-hero[data-smart-scene]>.polar-scene-image{opacity:0;transition:opacity 1.8s ease,filter 1.8s ease;object-position:center 35%;mask-image:linear-gradient(#000 0%,#000 25%,rgb(0 0 0 / .55) 49%,transparent 74%);-webkit-mask-image:linear-gradient(#000 0%,#000 25%,rgb(0 0 0 / .55) 49%,transparent 74%);}
+.feng-profile-hero[data-smart-scene][data-scene-night=true]{--xf-surface:#111a27;--xf-soft:#202d3e;--xf-text:#edf2fa;--xf-muted:#b0bfd2;--xf-line:rgb(218 230 255 / .16);--xf-accent:#b6d6ff;--xf-accent-text:#111a27;color:var(--xf-text);}
+.feng-profile-hero[data-scene-night=true]:not([data-scene=night])>.polar-scene-image{filter:brightness(.32) saturate(.55);}
+.feng-profile-hero[data-smart-scene]>.feng-profile-top,.feng-profile-hero[data-smart-scene]>.feng-profile-bottom{position:relative;z-index:1;}
+.polar-scene-atmosphere{position:absolute;inset:0;pointer-events:none;z-index:0;overflow:hidden;mask-image:linear-gradient(#000 0%,#000 32%,transparent 70%);-webkit-mask-image:linear-gradient(#000 0%,#000 32%,transparent 70%);}
+.polar-scene-orb{position:absolute;width:clamp(24px,3vw,40px);aspect-ratio:1;border-radius:50%;background:#fff7cc;box-shadow:0 0 30px 12px #ffecab80,0 0 75px 30px #ffe7a533;transform:translate(-50%,-50%);transition:left 60s linear,top 60s linear,opacity 1.8s;opacity:1;}
+
+[data-scene-condition=cloud] .polar-scene-orb{opacity:.12;}
+[data-scene-condition=rain] .polar-scene-orb,[data-scene-condition=snow] .polar-scene-orb{opacity:0;}
+.polar-scene-clouds{position:absolute;inset:-10% -12% 45%;background:radial-gradient(ellipse at 20% 40%,#dce6ee33,transparent 50%),radial-gradient(ellipse at 70% 25%,#c8d5df44,transparent 45%);opacity:0;}
+[data-scene-condition=cloud] .polar-scene-clouds,[data-scene-condition=rain] .polar-scene-clouds{opacity:1;}
+.polar-scene-particles{position:absolute;inset:0;overflow:hidden;}
+.polar-scene-particles i{display:none;position:absolute;left:var(--x);top:-25px;pointer-events:none;}
+[data-scene-condition=rain] .polar-scene-particles i{display:block;width:1px;height:20px;background:linear-gradient(transparent,#d9efffc9);}
+[data-scene-condition=snow] .polar-scene-particles i{display:block;width:4px;height:4px;border-radius:50%;background:#fff;box-shadow:0 0 3px #fff5;}
+[data-watermark-enabled=false]{display:none!important;}
+@media(prefers-reduced-motion:no-preference){
+ [data-scene-animation=true] .polar-scene-clouds{animation:polar-cloud-drift 24s ease-in-out infinite alternate;}
+ [data-scene-animation=true][data-scene-condition=rain] .polar-scene-particles i{animation:polar-scene-rain var(--speed) var(--delay) linear infinite;}
+ [data-scene-animation=true][data-scene-condition=snow] .polar-scene-particles i{animation:polar-scene-snow calc(var(--speed) * 7) var(--delay) linear infinite;}
+}
+.polar-scene-paused .polar-scene-atmosphere *{animation-play-state:paused!important;}
+@keyframes polar-cloud-drift{from{transform:translateX(-3%);}to{transform:translateX(4%);}}
+@keyframes polar-scene-rain{to{transform:translate(-60px,600px);}}
+@keyframes polar-scene-snow{0%{opacity:0;}12%,80%{opacity:.8;}100%{transform:translate(45px,550px);opacity:0;}}
+@media(prefers-reduced-motion:reduce){.feng-profile-hero[data-smart-scene],.feng-profile-hero[data-smart-scene]>.polar-scene-image,.polar-scene-orb{transition:none;}}
+
+/* Keep page surfaces square, including integrated headers on mobile. */
+#xf-view.feng-integrated-page > .xf-header,
+#xf-view.feng-integrated-page > #xf-content,
+#xf-view > #xf-content > :is(.xf-article,.feng-panel,.feng-talks,.feng-browse,.xf-reading),
+#xf-view > #xf-content:has(> :is(.xf-page-header,.xf-empty,section.xf-reading)){
+ border-radius:0;
+}
+
+/* Real lunar disk; horizon sits at 32% of the Hero panorama. */
+.polar-scene-moon{position:absolute;width:clamp(24px,3vw,40px);height:auto;transform:translate(-50%,-50%);filter:drop-shadow(0 0 7px #c3d9ff40);}
+.polar-scene-moon[hidden],.polar-scene-orb[hidden]{display:none!important;}
+[data-scene-condition=cloud] .polar-scene-moon{opacity:.2;}
+[data-scene-condition=rain] .polar-scene-moon,[data-scene-condition=snow] .polar-scene-moon{opacity:0;}
+
+.feng-profile-hero[data-scene-night=true] .feng-mini-bars{--github-activity-color:#fff;}

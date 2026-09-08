@@ -1,4 +1,4 @@
-# Polar resource bundles
+# ShanYing resource bundles
 
 Editable feature sources live in `source/`, outside the public theme. Run from the project root:
 

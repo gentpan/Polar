@@ -16,15 +16,35 @@
   const configuredScheme=document.querySelector('meta[name="feng-scheme"]')?.content;
   const fixedScheme=['light','dark'].includes(configuredScheme)?configuredScheme:null;
   let themePreference = fixedScheme || (['light','dark','system'].includes(storedTheme) ? storedTheme : 'system');
+  let manualTheme=false;
+  try{manualTheme=localStorage.getItem('xf-theme-manual')==='1'&&['light','dark'].includes(storedTheme);}catch{}
+  let visitorWeather=null;
+  try{const cached=JSON.parse(sessionStorage.getItem('polar-visitor-weather'));if(cached&&Date.now()-cached.at<3600000)visitorWeather=cached.weather;}catch{}
+  function isVisitorNight(){
+    if(typeof window.polarVisitorNight==='function')return window.polarVisitorNight(visitorWeather);
+    const hour=new Date().getHours();return hour<6||hour>=18;
+  }
+  document.addEventListener('polar:visitor-weather',event=>{
+    visitorWeather=event.detail;
+    try{sessionStorage.setItem('polar-visitor-weather',JSON.stringify({at:Date.now(),weather:visitorWeather}));}catch{}
+    themeButtons();
+  });
+  setInterval(()=>{if(!document.hidden)themeButtons();},60000);
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)themeButtons();});
   function themeButtons() {
     if(fixedScheme)themePreference=fixedScheme;
-    root.dataset.xfTheme = themePreference === 'system' ? (dark.matches ? 'dark' : 'light') : themePreference;
+    const night=isVisitorNight();
+    root.dataset.xfNight=String(night);
+    const autoNight=night&&!manualTheme;
+    root.dataset.xfTheme = autoNight?'dark':(themePreference === 'system' ? (dark.matches ? 'dark' : 'light') : themePreference);
     const names={system:'跟随系统',light:'浅色模式',dark:'深色模式'};
     const next={system:'light',light:'dark',dark:'system'};
     document.querySelectorAll('[data-xf-theme-toggle]').forEach(b => {
-      b.dataset.mode=themePreference;b.removeAttribute('aria-pressed');
+      b.dataset.mode=autoNight?'dark':themePreference;b.removeAttribute('aria-pressed');
       b.setAttribute('aria-label',names[themePreference]+'，点击切换为'+names[next[themePreference]]);
-      b.title=names[themePreference];
+      b.title=autoNight?'夜间自动深色，点击切换浅色':names[themePreference];
+      if(autoNight)b.setAttribute('aria-label',b.title);
+      b.removeAttribute('aria-disabled');
     });
   }
   function setHeaderSearch(open, restoreFocus = false) {
@@ -666,8 +686,9 @@
     const toggle = target.closest('[data-xf-theme-toggle]');
     if (toggle) {
       if(fixedScheme)return;
-      themePreference = {system:'light',light:'dark',dark:'system'}[themePreference];
-      try { localStorage.setItem('xf-theme', themePreference); } catch {}
+      themePreference = isVisitorNight()&&!manualTheme?'light':{system:'light',light:'dark',dark:'system'}[themePreference];
+      manualTheme=themePreference!=='system';
+      try { localStorage.setItem('xf-theme', themePreference);localStorage.setItem('xf-theme-manual',manualTheme?'1':'0'); } catch {}
       themeButtons(); return;
     }
     if (target.closest('[data-xf-search-open]')) {

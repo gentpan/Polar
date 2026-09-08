@@ -80,7 +80,7 @@ function feng_ai_endpoint($config) {
  return substr($url,-strlen($suffix))===$suffix?$url:$url.$suffix;
 }
 function feng_ai_request($config,$body,$image=false) {
- if(empty($config['key'])) return new WP_Error('feng_ai_key','请先在外观 → Polar 设置 → AI 助手中保存 API Key。');
+ if(empty($config['key'])) return new WP_Error('feng_ai_key','请先在外观 → ShanYing 设置 → AI 助手中保存 API Key。');
  if(empty($config['model'])) return new WP_Error('feng_ai_model','请先填写模型名称。');
  $url=feng_ai_endpoint($config); $valid=feng_ai_validate_url($url);
  if(is_wp_error($valid)) return $valid;
@@ -262,12 +262,12 @@ function feng_ai_settings_screen() {
  <p><button type="button" class="button" data-ai-test="<?php echo esc_attr($kind); ?>"><?php echo $kind==='text'?'测试文字连接':'测试封面生成'; ?></button> <span class="spinner"></span></p>
  <p class="description"><?php echo $kind==='text'?'测试已保存的配置，发送一条简短请求。':'测试已保存的配置，实际生成 1 张图片并保存到媒体库，会产生服务商用量。'; ?></p><div class="feng-ai-status" role="status" aria-live="polite"></div>
  </section><?php endforeach; feng_settings_save_bar(true); ?></form>
- <p>保存后，在「文章 → 编辑文章」的 <strong>Polar AI 助手</strong> 中使用。点击生成时，标题和正文会发送给你配置的服务商；文章不会自动发布。</p>
+ <p>保存后，在「文章 → 编辑文章」的 <strong>ShanYing AI 助手</strong> 中使用。点击生成时，标题和正文会发送给你配置的服务商；文章不会自动发布。</p>
  <p class="description">模型预设核对于 2026-09-06。官方文档：<a href="https://api-docs.deepseek.com/" target="_blank" rel="noopener noreferrer">DeepSeek</a> · <a href="https://developers.openai.com/api/docs/models" target="_blank" rel="noopener noreferrer">OpenAI</a> · <a href="https://help.aliyun.com/zh/model-studio/getting-started/models" target="_blank" rel="noopener noreferrer">千问</a>。DeepSeek 用于文字生成，封面请另外配置图片服务。</p></div></div></div>
  <?php
 }
 add_action('add_meta_boxes_post',function($post){
- if(current_user_can('edit_post',$post->ID)) add_meta_box('feng-ai-editor','Polar AI 助手','feng_ai_editor_screen','post','side','default',array('__block_editor_compatible_meta_box'=>true));
+ if(current_user_can('edit_post',$post->ID)) add_meta_box('feng-ai-editor','ShanYing AI 助手','feng_ai_editor_screen','post','side','default',array('__block_editor_compatible_meta_box'=>true));
 });
 function feng_ai_editor_screen($post) {
  ?>

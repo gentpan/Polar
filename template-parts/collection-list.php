@@ -23,6 +23,16 @@ $preview=true;
  <img class="feng-category-list__preview" alt="" hidden><span class="feng-preview-loading"></span>
  </div>
 </section>
+<?php
+$intro_term=$is_all?null:get_term((int)$term->term_id,'category');
+$intro_text=$intro_term&&!is_wp_error($intro_term)?trim(wp_strip_all_tags($intro_term->description)):'';
+$intro_image=$intro_term&&!is_wp_error($intro_term)?get_term_meta($intro_term->term_id,'feng_category_cover',true):'';
+if($intro_text||$intro_image): ?>
+<div class="polar-category-intro">
+ <?php if($intro_image): ?><img src="<?php echo esc_url($intro_image); ?>" alt="" loading="lazy" decoding="async"><?php endif; ?>
+ <?php if($intro_text): ?><p><?php echo esc_html($intro_text); ?></p><?php endif; ?>
+</div>
+<?php endif; ?>
 <?php $keywords=feng_hub_keywords($is_all?0:$term->term_id); ?>
 <nav class="feng-hub-keywords" aria-label="<?php echo esc_attr($is_all?'探索文章关键词':$term->name.'分类关键词'); ?>">
 <?php if($keywords): ?><span class="feng-hub-keywords__label">继续探索</span><?php foreach($keywords as $keyword):$tag_url=get_tag_link((int)$keyword->term_id);if(is_wp_error($tag_url))continue; ?>

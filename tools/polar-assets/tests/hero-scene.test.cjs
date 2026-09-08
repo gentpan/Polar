@@ -1,0 +1,18 @@
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+const source=fs.readFileSync('tools/polar-assets/source/assets/js/greeting.js','utf8');
+const start=source.indexOf('function polarHeroSceneState(');
+const end=source.indexOf('\nwindow.polarVisitorNight=',start);
+const state=vm.runInNewContext('('+source.slice(start,end)+')');
+const rise=Date.parse('2026-09-09T01:00:00Z')/1000,set=Date.parse('2026-09-09T13:00:00Z')/1000;
+const weather={utc_offset:18000,sunrise:[rise],sunset:[set],code:0,day:true};
+assert.equal(state(new Date('2026-09-09T07:00:00Z'),weather).scene,'day');
+assert.equal(state(new Date('2026-09-09T01:00:00Z'),weather).scene,'dawn');
+assert.equal(state(new Date('2026-09-09T13:00:00Z'),weather).scene,'sunset');
+assert.equal(state(new Date('2026-09-09T18:00:00Z'),weather).scene,'night');
+for(const [code,scene] of [[3,'cloud'],[45,'cloud'],[61,'rain'],[95,'rain'],[73,'snow']])assert.equal(state(new Date('2026-09-09T07:00:00Z'),{...weather,code}).scene,scene);
+assert.equal(state(new Date('2026-09-09T18:00:00Z'),{...weather,code:61}).night,true);
+for(const preview of ['dawn','day','sunset','night','cloud','rain','snow'])assert.equal(state(new Date(),null,preview).scene,preview);
+assert.equal(state(new Date(2026,8,9,12),null).scene,'day');
+assert.equal(state(new Date(2026,8,9,23),null).scene,'night');
+assert.equal(state(new Date('2026-09-09T07:00:00Z'),weather).y,6);
+console.log('Scene tests passed: solar times, timezone, weather, preview and local fallback.');

@@ -49,3 +49,22 @@ document.addEventListener('click',async event=>{
  catch{if(!controller.signal.aborted)(window as any).fengToast?.('加载失败，请重试','error');}
  finally{clearTimeout(timer);if(hubRequest===controller){panel.removeAttribute('aria-busy');hubRequest=null;}}
 });
+
+// Category strip: manual selection with category backgrounds.
+let stripCleanup: (()=>void)|undefined;
+function mountStrip(){
+ stripCleanup?.();
+ const nav=document.querySelector<HTMLElement>('.feng-article-hub__tabs');if(!nav)return;
+ const tabs=Array.from(nav.querySelectorAll<HTMLButtonElement>('[data-collection-tab]'));
+ const abort=new AbortController(),signal=abort.signal;
+ nav.style.setProperty('--category-count',String(tabs.length));
+ tabs.forEach(tab=>{
+  if(tab.querySelector('.polar-tab-label'))return;
+  const label=document.createElement('span');label.className='polar-tab-label';while(tab.firstChild)label.append(tab.firstChild);tab.append(label);
+  if(tab.dataset.watermark){const img=new Image();img.src=tab.dataset.watermark;img.alt='';img.className='polar-tab-cover';img.loading='lazy';img.addEventListener('error',()=>{img.remove();tab.classList.remove('has-category-cover');},{signal});tab.prepend(img);tab.classList.add('has-category-cover');}
+ });
+ stripCleanup=()=>{abort.abort();};
+}
+document.addEventListener('xf:mounted',mountStrip);
+document.addEventListener('xf:before-unmount',()=>stripCleanup?.());
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mountStrip,{once:true});else mountStrip();

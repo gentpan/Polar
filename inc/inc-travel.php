@@ -63,7 +63,7 @@ function feng_map_config(){return wp_parse_args(get_option('feng_map_settings',a
 function feng_map_public(){ $c=feng_map_config();$p=$c['provider'];return array('globe_background'=>$c['globe_background'],'provider'=>$p,'key'=>$c[$p==='mapbox'?'mapbox_token':$p.'_browser'],'security'=>$p==='amap'&&!$c['amap_proxy']?$c['amap_security']:'','proxy'=>$p==='amap'?$c['amap_proxy']:''); }
 function feng_map_search($q,$cfg){
  $provider=$cfg['provider'];$key=$cfg[$provider==='mapbox'?'mapbox_token':$provider.'_server'];
- if(!$key)return new WP_Error('map_key','请先在「外观 → Polar 设置 → 地图服务」填写所选地图的搜索 Key。');
+ if(!$key)return new WP_Error('map_key','请先在「外观 → ShanYing 设置 → 地图服务」填写所选地图的搜索 Key。');
  if($provider==='mapbox')$url=add_query_arg(array('q'=>$q,'access_token'=>$key,'permanent'=>'true','autocomplete'=>'false','limit'=>5,'language'=>'zh','types'=>'country,region,place,locality,address'),'https://api.mapbox.com/search/geocode/v6/forward');
  elseif($provider==='google')$url=add_query_arg(array('address'=>$q,'key'=>$key,'language'=>'zh-CN'),'https://maps.googleapis.com/maps/api/geocode/json');
  else $url=add_query_arg(array('address'=>$q,'key'=>$key),'https://restapi.amap.com/v3/geocode/geo');

@@ -12,8 +12,8 @@
 /* Let the article cover reach the outer rounded edge without a glass border. */
 .single-post .xf-article { border: 0; }
 .single-post .xf-prose { --xf-text: var(--feng-ink); }
-.feng-entry-hero { min-height: 360px; padding: 64px 30px 30px; }
-.feng-entry-hero.xf-reading-cover--image { min-height: 460px; border-radius: 0; }
+.feng-entry-hero { min-height: 280px; padding: 36px 30px 20px; }
+.feng-entry-hero.xf-reading-cover--image { min-height: 350px; border-radius: 0; }
 /* One continuous vector edge replaces two very flat elliptical corner clips.
    The opaque fill matches the article paper; no blur, scaling or feathered mask. */
 .feng-entry-curve { position: absolute; left: 0; bottom: -1px; width: 100%; height: 25px; display: block; fill: var(--feng-paper); z-index: 1; pointer-events: none; }
@@ -51,7 +51,7 @@
 .single-post .xf-article-footer { width: calc(100% - 56px); padding-inline: 0; }
 @media (max-width: 700px) {
  .single-post .xf-article > .xf-prose,.single-post .xf-article-footer { width: calc(100% - 36px); }
- .feng-entry-hero,.feng-entry-hero.xf-reading-cover--image { padding: 48px 18px 24px; min-height: 420px; }
+ .feng-entry-hero,.feng-entry-hero.xf-reading-cover--image { padding: 30px 18px 18px; min-height: 300px; }
  .feng-entry-curve { height: 19px; }
  .feng-entry-hero__copy h1 { font-size: 24px; }
  

@@ -5,8 +5,11 @@ function feng_setting( $key, $default = false ) {
  return is_array( $settings ) && array_key_exists( $key, $settings ) ? $settings[$key] : get_theme_mod( $key, $default );
 }
 function feng_settings_schema() {
+ $category_options=array('0'=>'自动选择');
+ foreach(get_categories(array('hide_empty'=>false)) as $category)$category_options[(string)$category->term_id]=$category->name;
  return array(
   'appearance' => array( 'title' => '外观与交互', 'fields' => array(
+   'admin_appearance'=>array('后台外观主题','select','native',array('native'=>'WordPress 原生','polar'=>'ShanYing · 极夜工作台')),
    'editor_mode'=>array('文章与页面编辑器','select','classic',array('classic'=>'经典编辑器（传统可视化 / 文本）','block'=>'区块编辑器（Gutenberg）')),
    'images_webp'=>array('上传图片自动转换为 WebP','checkbox',true),
    'images_fade'=>array('图片淡入效果','checkbox',true),
@@ -22,11 +25,20 @@ function feng_settings_schema() {
    'xf_eyebrow'=>array('首页欢迎语','text','你好，欢迎来到我的生活切片'),
    'greeting_enabled'=>array('昵称与当地时间问候','checkbox',true),
    'greeting_pet'=>array('小鸟欢迎联动','checkbox',true),
+   'hero_smart_scene'=>array('Hero 智能山水背景','checkbox',true),
+   'hero_scene_animation'=>array('Hero 云层与雨雪动画','checkbox',true),
+   'hero_scene_preview'=>array('Hero 场景预览（自动时跟随访客）','select','auto',array('auto'=>'自动','dawn'=>'清晨','day'=>'白天','sunset'=>'日落','night'=>'夜晚','cloud'=>'阴天','rain'=>'雨天','snow'=>'雪天')),
    'greeting_weather'=>array('Hero 天气水印','checkbox',true),
    'weather_city'=>array('博主天气城市（建议填写城市英文名）','text',''),
    'weather_visitor'=>array('显示访客所在城市天气','checkbox',true),
    'weather_animation'=>array('天气水印动画','checkbox',true),
    'greeting_weather_service'=>array('天气服务','select','openmeteo',array('openmeteo'=>'Open-Meteo 公共接口（无需密钥，适用于非商业用途）')),
+   'home_all_cover'=>array('全部分类区块图片','image',''),
+   'home_category_1'=>array('首页第 1 个分类','select','0',$category_options),
+   'home_category_2'=>array('首页第 2 个分类','select','0',$category_options),
+   'home_category_3'=>array('首页第 3 个分类','select','0',$category_options),
+   'home_category_4'=>array('首页第 4 个分类','select','0',$category_options),
+   'home_category_5'=>array('首页第 5 个分类','select','0',$category_options),
    'xf_hero_intro'=>array('首页简介','textarea','一些日常，一些远方，一些想要留下的瞬间。'),
    'hero_portrait'=>array('Hero 主图（留空使用管理员头像）','image',''),
    'hero_photo_1'=>array('生活照片 1','image',''),
@@ -79,12 +91,12 @@ function feng_settings_schema() {
    'analytics_code'=>array('自定义统计代码','code',''),
   )),
   'footer'=>array('title'=>'页脚与友链','fields'=>array(
-   'footer_background'=>array('页脚备用背景图片','image',''),
-   'footer_seasonal'=>array('页脚背景随四季切换','checkbox',true),
-   'footer_spring'=>array('春季页脚图片','image',get_theme_file_uri('/assets/images/seasons/spring.webp')),
-   'footer_summer'=>array('夏季页脚图片','image',get_theme_file_uri('/assets/images/seasons/summer.webp')),
-   'footer_autumn'=>array('秋季页脚图片','image',get_theme_file_uri('/assets/images/seasons/autumn.webp')),
-   'footer_winter'=>array('冬季页脚图片','image',get_theme_file_uri('/assets/images/seasons/winter.webp')),
+   'footer_background'=>array('Hero 备用背景图片','image',''),
+   'footer_seasonal'=>array('Hero 背景随四季切换','checkbox',true),
+   'footer_spring'=>array('春季 Hero 图片','image',get_theme_file_uri('/assets/images/seasons/spring.webp')),
+   'footer_summer'=>array('夏季 Hero 图片','image',get_theme_file_uri('/assets/images/seasons/summer.webp')),
+   'footer_autumn'=>array('秋季 Hero 图片','image',get_theme_file_uri('/assets/images/seasons/autumn.webp')),
+   'footer_winter'=>array('冬季 Hero 图片','image',get_theme_file_uri('/assets/images/seasons/winter.webp')),
 
    'footer_stats'=>array('页脚在线人数与累计访问次数','checkbox',true),
    'site_since'=>array('建站日期','date',''),
@@ -121,7 +133,7 @@ function feng_register_settings() {
  register_setting('feng_settings_group','feng_settings',array('type'=>'array','sanitize_callback'=>'feng_sanitize_settings','default'=>array()));
 }
 add_action('admin_init','feng_register_settings');
-function feng_admin_menu() { add_theme_page('Polar 主题设置','Polar 设置','manage_options','feng-settings','feng_settings_screen'); }
+function feng_admin_menu() { add_theme_page('ShanYing 主题设置','ShanYing 设置','manage_options','feng-settings','feng_settings_screen'); }
 add_action('admin_menu','feng_admin_menu');
 function feng_admin_assets($hook) {
  if ($hook !== 'appearance_page_feng-settings') return;
@@ -133,7 +145,7 @@ add_action('admin_enqueue_scripts','feng_admin_assets');
 /** Shared settings shell, using native WordPress controls and save handling. */
 function feng_settings_header() {
  $theme=wp_get_theme(get_template());$name=$theme->get('Name');$version=$theme->get('Version');
- echo '<header class="feng-admin-header"><div class="feng-admin-brand"><div class="feng-admin-brandline"><span class="feng-admin-emblem" aria-hidden="true"><img src="'.esc_url(get_theme_file_uri('/assets/images/brand/polar-icon.png')).'" width="38" height="38" alt=""></span><h1>'.esc_html($name).'<span class="feng-admin-title-label">主题设置</span></h1></div><p>记录生活，自有光芒。文章、说说与足迹，都有自己的位置。</p><details class="feng-admin-about"><summary>关于极地 · 技术与功能</summary><p>原生 WordPress / PHP，JavaScript 与 CSS；局部交互采用 React、Motion 和 Lottie，地图支持 Mapbox、Google Maps 与高德。</p><p>分类文章、说说、旅行足迹、友链动态、评论等级、四季页脚、音乐与宠物陪伴；AI 与外部服务按需配置。</p></details></div><div class="feng-admin-header-right"><div class="feng-admin-badges" aria-label="主题信息"><span class="feng-admin-badge feng-admin-badge--theme">'.esc_html($name).'</span><span class="feng-admin-badge feng-admin-badge--version" aria-label="主题版本 '.esc_attr($version).'">v'.esc_html($version).'</span><span class="feng-admin-badge feng-admin-badge--author" aria-label="开发者：西风">西风</span></div><a class="feng-admin-site-link" href="'.esc_url(home_url('/')).'" target="_blank" rel="noopener">查看站点 <span class="dashicons dashicons-external" aria-hidden="true"></span></a></div></header><hr class="wp-header-end">';
+ echo '<header class="feng-admin-header"><div class="feng-admin-brand"><div class="feng-admin-brandline"><span class="feng-admin-emblem" aria-hidden="true"><img src="'.esc_url(get_theme_file_uri('/assets/images/brand/polar-icon.png')).'" width="38" height="38" alt=""></span><h1>'.esc_html($name).'<span class="feng-admin-title-label">主题设置</span></h1></div><p>记录生活，自有光芒。文章、说说与足迹，都有自己的位置。</p><details class="feng-admin-about"><summary>关于山映 · 技术与功能</summary><p>原生 WordPress / PHP，JavaScript 与 CSS；局部交互采用 React、Motion 和 Lottie，地图支持 Mapbox、Google Maps 与高德。</p><p>分类文章、说说、旅行足迹、友链动态、评论等级、四季页脚、音乐与宠物陪伴；AI 与外部服务按需配置。</p></details></div><div class="feng-admin-header-right"><div class="feng-admin-badges" aria-label="主题信息"><span class="feng-admin-badge feng-admin-badge--theme">'.esc_html($name).'</span><span class="feng-admin-badge feng-admin-badge--version" aria-label="主题版本 '.esc_attr($version).'">v'.esc_html($version).'</span><span class="feng-admin-badge feng-admin-badge--author" aria-label="开发者：西风">西风</span></div><a class="feng-admin-site-link" href="'.esc_url(home_url('/')).'" target="_blank" rel="noopener">查看站点 <span class="dashicons dashicons-external" aria-hidden="true"></span></a></div></header><hr class="wp-header-end">';
 }
 
 function feng_settings_description($id) {
@@ -186,3 +198,13 @@ add_filter('use_block_editor_for_post',function($use,$post){
 add_action('admin_enqueue_scripts',function(){
  wp_enqueue_style('feng-admin-square',get_theme_file_uri('/assets/css/admin-square.css'),array(),feng_asset_version('/assets/css/admin-square.css'));
 },100);
+
+add_filter('admin_body_class',function($classes){return $classes.(feng_setting('admin_appearance','native')==='polar'?' polar-admin-skin':'');});
+add_action('admin_enqueue_scripts',function(){
+ if(feng_setting('admin_appearance','native')==='polar')wp_enqueue_style('polar-admin-skin',get_theme_file_uri('/assets/css/admin-skin.css'),array('common','forms'),feng_asset_version('/assets/css/admin-skin.css'));
+},110);
+
+add_filter('post_date_column_status',function($status){
+ if(feng_setting('admin_appearance','native')!=='polar'||!$status)return $status;
+ return '<span class="polar-date-status">'.$status.'</span>';
+});

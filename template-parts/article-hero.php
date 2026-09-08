@@ -39,6 +39,7 @@ $feng_next=get_next_post();
       <span class="feng-entry-round__glyph"><?php echo feng_icon($direction); ?></span>
      <?php echo $target?'</a>':'</span>'; ?>
     <?php endforeach; ?>
+    <button type="button" class="feng-entry-round" data-reading-toggle hidden aria-expanded="false" aria-controls="feng-article-toc" aria-label="打开文章目录" title="文章目录"><i class="fa-solid fa-list-ul" aria-hidden="true"></i></button>
    </nav>
   </div>
  </div>

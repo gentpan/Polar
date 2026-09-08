@@ -21,13 +21,13 @@ function feng_friend_avatar_rebuild(){
 }
 add_action('init',function(){if(get_option('feng_friend_avatar_version')!=='1')feng_friend_avatar_rebuild();},45);
 foreach(array('comment_post','transition_comment_status','edit_comment','deleted_comment','add_link','edit_link','deleted_link') as $hook)add_action($hook,'feng_friend_avatar_rebuild',50,0);
-function feng_friend_avatar($friend,$size=48){
+function feng_friend_avatar($friend,$size=48,$icon_fallback=false){
  if(is_numeric($friend))$friend=get_bookmark((int)$friend);if(!$friend)return '';
  $domain=feng_friend_domain($friend->link_url);$all=get_option('feng_friend_avatars',array());$v=$all[(int)$friend->link_id]??array();
  $hash=($v['domain']??'')===$domain?(($v['manual']??'')?:($v['hash']??'')):'';
  $fallback='https://favicon.la/'.rawurlencode($domain);
- $url=$hash?'https://gravatar.bluecdn.com/avatar/'.$hash.'?s='.($size*2).'&d=404':$fallback;
- return '<img class="feng-friend-avatar-img" src="'.esc_url($url).'" data-friend-fallback="'.esc_url($fallback).'" width="'.absint($size).'" height="'.absint($size).'" alt="" loading="lazy" decoding="async"><span class="feng-friend-avatar-initial" hidden aria-hidden="true">'.esc_html(mb_substr(wp_specialchars_decode($friend->link_name),0,1)).'</span>';
+ $url=!empty($friend->link_image)?$friend->link_image:($hash?'https://gravatar.bluecdn.com/avatar/'.$hash.'?s='.($size*2).'&d=404':$fallback);
+ return '<img class="feng-friend-avatar-img" src="'.esc_url($url).'" data-friend-fallback="'.esc_url($fallback).'" width="'.absint($size).'" height="'.absint($size).'" alt="" loading="lazy" decoding="async"><span class="feng-friend-avatar-initial" hidden aria-hidden="true">'.($icon_fallback?'<i class="fa-solid fa-globe" aria-hidden="true"></i>':esc_html(mb_substr(wp_specialchars_decode($friend->link_name),0,1))).'</span>';
 }
 add_action('add_meta_boxes_link',function(){add_meta_box('feng-friend-avatar','邮箱头像','feng_friend_avatar_box','link','side');});
 function feng_friend_avatar_box($link){
@@ -304,3 +304,177 @@ function feng_feed_admin_refresh() {
  wp_send_json_success(array('pending'=>count($cycle['pending']??array()),'done'=>$cycle['done']??0,'total'=>$cycle['total']??0,'added'=>$cycle['added']??0,'errors'=>$cycle['errors']??0));
 }
 add_action('wp_ajax_feng_feed_refresh','feng_feed_admin_refresh');
+
+
+// Public applications enter the native link manager as invisible bookmarks.
+add_action('admin_post_nopriv_feng_friend_apply','feng_friend_apply');
+add_action('admin_post_feng_friend_apply','feng_friend_apply');
+function feng_friend_apply(){
+ if($_SERVER['REQUEST_METHOD']!=='POST') wp_die('请通过申请表提交。', '', array('response'=>405));
+ check_admin_referer('feng_friend_apply','friend_nonce');
+ $input=wp_unslash($_POST);
+ foreach(array('site_name','site_url','site_description','site_avatar','site_rss','contact_website','page_id','site_email','friend_mode') as $field) if(isset($input[$field])&&!is_scalar($input[$field])) wp_die('表单格式不正确。');
+ $page=absint($input['page_id']??0);
+ if(get_post_status($page)!=='publish'||get_page_template_slug($page)!=='pages/friends.php'||post_password_required($page)) wp_die('此页面暂不接受申请。');
+ if(!empty($input['contact_website'])) wp_die('提交失败。');
+ $name=sanitize_text_field($input['site_name']??'');$description=sanitize_textarea_field($input['site_description']??'');
+ $email=trim($input['site_email']??'');if(!is_email($email))wp_die('请填写有效的常用邮箱。');
+ $identity_hash=md5(strtolower($email));$editing=($input['friend_mode']??'apply')==='edit';
+ $avatar_input=trim($input['site_avatar']??'');
+ $avatar_hash=is_email($avatar_input)?md5(strtolower($avatar_input)):'';
+ if($avatar_hash)$input['site_avatar']='';
+ elseif($avatar_input&&!preg_match('~^https?://~i',$avatar_input))wp_die('头像请填写有效邮箱或 HTTP / HTTPS 图片地址。');
+ $urls=array();foreach(array('site_url','site_avatar','site_rss') as $field){$raw=trim($input[$field]??'');$url=esc_url_raw($raw,array('http','https'));if($raw&&(!$url||!wp_parse_url($url,PHP_URL_HOST))) wp_die('请填写有效的 HTTP 或 HTTPS 地址。');if(strlen($url)>255) wp_die('地址过长。');$urls[$field]=$url;}
+ if(!$name||!$description||!$urls['site_url']||mb_strlen($name)>100||mb_strlen($description)>255) wp_die('请填写站点名称、地址和简短介绍。');
+ if(!$avatar_input)$avatar_hash=$identity_hash;
+ $rate='feng_friend_apply_'.hash_hmac('sha256',$_SERVER['REMOTE_ADDR']??'',wp_salt());
+ if(get_transient($rate)) wp_die('刚刚已提交申请，请稍后再试。', '', array('response'=>429));
+ global $wpdb;
+ if(!$editing&&$wpdb->get_var($wpdb->prepare("SELECT link_id FROM {$wpdb->links} WHERE link_url=%s LIMIT 1",$urls['site_url']))) wp_die('这个站点已在友链或待审核列表中，请勿重复申请。');
+ if($editing){
+  $identities=get_option('feng_friend_identity_hashes',array());$avatars=get_option('feng_friend_avatars',array());$matches=array();
+  foreach(get_bookmarks(array('hide_invisible'=>false)) as $link){$hash=$identities[$link->link_id]??($avatars[$link->link_id]['manual']??'');if($hash&&hash_equals($hash,$identity_hash))$matches[]=$link;}
+  if(count($matches)!==1){set_transient($rate,1,MINUTE_IN_SECONDS);wp_die('无法唯一匹配原友链，请核对上次申请邮箱，或联系博主处理。');}
+  $target=$matches[0];
+  if(!feng_friend_verify_code($input,$identity_hash,(int)$target->link_id))wp_die('验证码无效或已过期，请重新获取后提交。');
+  $proposal=array('name'=>$name,'url'=>$urls['site_url'],'description'=>$description,'avatar'=>$urls['site_avatar'],'rss'=>$urls['site_rss'],'avatar_hash'=>$avatar_hash,'submitted'=>time());
+  update_option('feng_friend_change_'.(int)$target->link_id,$proposal,false);
+  require_once ABSPATH.'wp-admin/includes/bookmark.php';
+  wp_update_link(array('link_id'=>$target->link_id,'link_notes'=>'待审核修改申请：'.wp_json_encode($proposal,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES)));
+  set_transient($rate,1,10*MINUTE_IN_SECONDS);
+  wp_safe_redirect(add_query_arg('friend_submitted','1',get_permalink($page)),303);exit;
+ }
+ require_once ABSPATH.'wp-admin/includes/bookmark.php';
+ $id=wp_insert_link(array('link_name'=>$name,'link_url'=>$urls['site_url'],'link_description'=>$description,'link_image'=>$urls['site_avatar'],'link_rss'=>$urls['site_rss'],'link_visible'=>'N','link_owner'=>0,'link_notes'=>'前台友链申请，待审核。审核后将「可见」设为是。','link_category'=>array((int)get_option('default_link_category'))),true);
+ if(is_wp_error($id)||!$id) wp_die('申请保存失败，请稍后重试。');
+ $identities=get_option('feng_friend_identity_hashes',array());$identities[(int)$id]=$identity_hash;update_option('feng_friend_identity_hashes',$identities,false);
+ if($avatar_hash){
+  $avatars=get_option('feng_friend_avatars',array());
+  $avatars[(int)$id]=array('domain'=>feng_friend_domain($urls['site_url']),'manual'=>$avatar_hash,'hash'=>'','comment'=>0);
+  update_option('feng_friend_avatars',$avatars,false);
+ }
+ set_transient($rate,1,10*MINUTE_IN_SECONDS);
+ wp_safe_redirect(add_query_arg('friend_submitted','1',get_permalink($page)).'#friend-application',303);exit;
+}
+
+// Link-category icons share the article-category SVG / Font Awesome sanitizer.
+function feng_friend_category_icon_field($term=null){
+ $code=$term instanceof WP_Term?get_term_meta($term->term_id,'feng_friend_category_icon',true):'';
+ wp_nonce_field('feng_friend_category_icon','feng_friend_category_icon_nonce');
+ echo '<label for="feng-friend-category-icon">Font Awesome 类名 / SVG 代码</label><textarea id="feng-friend-category-icon" name="feng_friend_category_icon" class="large-text code" rows="4" placeholder="fa-solid fa-code">'.esc_textarea($code).'</textarea><p class="description">可填写 Font Awesome 类名、完整 i 标签或 SVG 代码。留空使用文件夹图标。</p><div style="font-size:24px">'.feng_badge_icon_markup($code).'</div>';
+}
+function feng_friend_category_icon($id){return feng_badge_icon_markup(get_term_meta($id,'feng_friend_category_icon',true))?:feng_badge_icon_markup('fa-regular fa-folder');}
+add_action('link_category_add_form_fields',function(){echo '<div class="form-field">';feng_friend_category_icon_field();echo '</div>';});
+add_action('link_category_edit_form_fields',function($term){echo '<tr class="form-field"><th scope="row">分类图标</th><td>';feng_friend_category_icon_field($term);echo '</td></tr>';});
+function feng_friend_category_icon_save($id){
+ $taxonomy=get_taxonomy('link_category');
+ if(!$taxonomy||!current_user_can($taxonomy->cap->edit_terms))return;
+ $nonce=$_POST['feng_friend_category_icon_nonce']??'';
+ if(!is_string($nonce)||!wp_verify_nonce(wp_unslash($nonce),'feng_friend_category_icon'))return;
+ if(!isset($_POST['feng_friend_category_icon'])||!is_string($_POST['feng_friend_category_icon']))return;
+ $code=feng_badge_icon_code(wp_unslash($_POST['feng_friend_category_icon']));
+ if($code)update_term_meta($id,'feng_friend_category_icon',$code);else delete_term_meta($id,'feng_friend_category_icon');
+}
+add_action('created_link_category','feng_friend_category_icon_save');
+add_action('edited_link_category','feng_friend_category_icon_save');
+add_filter('manage_edit-link_category_columns',function($columns){$columns['feng_friend_icon']='图标';return $columns;});
+add_filter('manage_link_category_custom_column',function($content,$column,$id){return $column==='feng_friend_icon'?feng_friend_category_icon($id):$content;},10,3);
+add_action('admin_enqueue_scripts',function(){if(get_current_screen()->taxonomy==='link_category')feng_category_fontawesome();});
+
+function feng_friend_send_code(){
+ check_ajax_referer('feng_friend_apply','friend_nonce');
+ $email=isset($_POST['email'])&&is_string($_POST['email'])?strtolower(trim(wp_unslash($_POST['email']))):'';
+ if(!is_email($email))wp_send_json_error(array('message'=>'请填写有效邮箱。'),400);
+ $key=hash_hmac('sha256',$email,wp_salt());$ipkey='feng_friend_mail_ip_'.hash_hmac('sha256',$_SERVER['REMOTE_ADDR']??'',wp_salt());
+ if(get_transient('feng_friend_mail_wait_'.$key)||(int)get_transient($ipkey)>=10)wp_send_json_error(array('message'=>'发送过于频繁，请稍后再试。'),429);
+ set_transient('feng_friend_mail_wait_'.$key,1,60);set_transient($ipkey,(int)get_transient($ipkey)+1,HOUR_IN_SECONDS);
+ $hash=md5($email);$ids=get_option('feng_friend_identity_hashes',array());$avatars=get_option('feng_friend_avatars',array());$matches=array();
+ foreach(get_bookmarks(array('hide_invisible'=>false)) as $link){$saved=$ids[$link->link_id]??($avatars[$link->link_id]['manual']??'');if($saved&&hash_equals($saved,$hash))$matches[]=$link->link_id;}
+ $token=wp_generate_password(40,false,false);
+ if(count($matches)===1){
+  $code=(string)random_int(100000,999999);
+  $record=array('email'=>$hash,'link'=>(int)$matches[0],'hash'=>wp_hash_password($code),'expires'=>time()+600,'tries'=>0);
+  set_transient('feng_friend_code_'.$token,$record,600);
+  if(!wp_mail($email,'友链修改验证码：'.get_bloginfo('name'),'你的友链修改验证码是：'.$code."\n10 分钟内有效，仅可使用一次。如果不是你本人操作，请忽略本邮件。")){
+   delete_transient('feng_friend_code_'.$token);wp_send_json_error(array('message'=>'邮件发送失败，请稍后重试或联系博主。'),503);
+  }
+ }
+ wp_send_json_success(array('token'=>$token,'message'=>'若邮箱与原友链匹配，验证码将发送至该邮箱，10 分钟内有效。'));
+}
+add_action('wp_ajax_feng_friend_send_code','feng_friend_send_code');
+add_action('wp_ajax_nopriv_feng_friend_send_code','feng_friend_send_code');
+function feng_friend_verify_code($input,$identity_hash,$link_id){
+ $token=$input['email_token']??'';$code=$input['email_code']??'';
+ if(!is_string($token)||!preg_match('/^[a-zA-Z0-9]{40}$/D',$token)||!is_string($code)||!preg_match('/^[0-9]{6}$/D',$code))return false;
+ $key='feng_friend_code_'.$token;$record=get_transient($key);
+ if(!$record||$record['expires']<=time()||$record['tries']>=5)return false;
+ $record['tries']++;set_transient($key,$record,max(1,$record['expires']-time()));
+ if(!hash_equals($record['email'],$identity_hash)||(int)$record['link']!==$link_id||!wp_check_password($code,$record['hash']))return false;
+ delete_transient($key);return true;
+}
+
+add_action('add_meta_boxes_link',function(){add_meta_box('feng-friend-cover','友链封面图',function($link){
+ wp_nonce_field('feng_friend_cover','feng_friend_cover_nonce');
+ echo '<p><label for="feng-friend-cover-url">独立封面地址（选填）</label></p><input class="widefat" type="url" id="feng-friend-cover-url" name="feng_friend_cover" value="'.esc_attr(get_option('feng_friend_cover_'.(int)($link->link_id??0),'')).'"><p class="description">使用横向图片网址。有封面时展示封面；留空显示完整头像与模糊背景。</p>';
+},'link','side');});
+function feng_friend_cover_save($id){
+ if(!current_user_can('manage_links')||!isset($_POST['feng_friend_cover_nonce'],$_POST['feng_friend_cover'])||!is_string($_POST['feng_friend_cover_nonce'])||!is_string($_POST['feng_friend_cover'])||!wp_verify_nonce(wp_unslash($_POST['feng_friend_cover_nonce']),'feng_friend_cover'))return;
+ $url=esc_url_raw(wp_unslash($_POST['feng_friend_cover']),array('http','https'));
+ if($url)update_option('feng_friend_cover_'.(int)$id,$url,false);else delete_option('feng_friend_cover_'.(int)$id);
+}
+add_action('add_link','feng_friend_cover_save');add_action('edit_link','feng_friend_cover_save');
+add_action('deleted_link',function($id){delete_option('feng_friend_cover_'.(int)$id);});
+
+// Recreational memory-game scores; display names are not verified identities.
+add_action('wp_ajax_feng_friend_game','feng_friend_game');
+add_action('wp_ajax_nopriv_feng_friend_game','feng_friend_game');
+function feng_friend_game(){
+ check_ajax_referer('feng_friend_game','nonce');
+ $op=isset($_POST['op'])&&is_string($_POST['op'])?$_POST['op']:'';
+ if($op==='player')wp_send_json_success(feng_game_player());
+ if(strpos($op,'match_')===0){feng_match_game_request($op);return;}
+ $size=($_POST['size']??'16')==='64'?64:16;
+ $score_key=$size===64?'feng_friend_game_scores_64':'feng_friend_game_scores';
+ $board=get_option($score_key,array());
+ if($op==='list')wp_send_json_success(array('scores'=>array_values($board)));
+ $ip=hash_hmac('sha256',$_SERVER['REMOTE_ADDR']??'',wp_salt());
+ if($op==='start'){
+  if(get_transient('feng_game_wait_'.$ip))wp_send_json_error(array('message'=>'请稍候再开始。'),429);
+  set_transient('feng_game_wait_'.$ip,1,3);
+  $deck=array_merge(range(0,$size/2-1),range(0,$size/2-1));shuffle($deck);$token=wp_generate_password(32,false,false);
+  set_transient('feng_game_round_'.$token,array('deck'=>$deck,'size'=>$size,'start'=>microtime(true)),HOUR_IN_SECONDS);
+  wp_send_json_success(array('deck'=>$deck,'token'=>$token));
+ }
+ if($op!=='score')wp_send_json_error(null,400);
+ $token=$_POST['token']??'';$raw=$_POST['flips']??'';
+ if(!is_string($token)||!preg_match('/^[A-Za-z0-9]{32}$/D',$token)||!is_string($raw)||strlen($raw)>10000)wp_send_json_error(null,400);
+ $round=get_transient('feng_game_round_'.$token);$flips=json_decode(wp_unslash($raw),true);
+ if(!$round||($round['size']??16)!==$size||!is_array($flips)||count($flips)<$size||count($flips)>1000||count($flips)%2)wp_send_json_error(null,400);
+ $matched=array();for($i=0;$i<count($flips);$i+=2){$a=$flips[$i];$b=$flips[$i+1];if(!is_int($a)||!is_int($b)||$a<0||$a>=$size||$b<0||$b>=$size||$a===$b||isset($matched[$a])||isset($matched[$b]))wp_send_json_error(null,400);if($round['deck'][$a]===$round['deck'][$b]){$matched[$a]=true;$matched[$b]=true;}}
+ $elapsed=(int)round(microtime(true)-$round['start']);if(count($matched)!==$size||$elapsed<1)wp_send_json_error(null,400);
+ delete_transient('feng_game_round_'.$token);
+ $commenter=wp_get_current_commenter();$user=wp_get_current_user();$name=$user->exists()?$user->display_name:($commenter['comment_author']?:'访客');
+ $entry=array_merge(feng_game_player(),array('moves'=>count($flips),'seconds'=>$elapsed));
+ $board[]=$entry;usort($board,function($a,$b){return $a['moves']<=>$b['moves']?:$a['seconds']<=>$b['seconds'];});$fast=$board;usort($fast,function($a,$b){return $a['seconds']<=>$b['seconds']?:$a['moves']<=>$b['moves'];});$board=array_values(array_unique(array_merge(array_slice($board,0,10),array_slice($fast,0,10)),SORT_REGULAR));update_option($score_key,$board,false);
+ wp_send_json_success(array('scores'=>$board,'score'=>$entry));
+}
+
+function feng_game_player(){
+ $user=wp_get_current_user();$commenter=wp_get_current_commenter();$email=$user->exists()?$user->user_email:($commenter['comment_author_email']??'');
+ return array('name'=>mb_substr(sanitize_text_field($user->exists()?$user->display_name:($commenter['comment_author']?:'访客')),0,30),'avatar'=>get_avatar_url($email?:0,array('size'=>64,'default'=>'mystery')));
+}
+
+function feng_match_game_request($op){
+ $scores=get_option('feng_match_scores',array());
+ if($op==='match_list')wp_send_json_success(array('scores'=>$scores));
+ if($op==='match_start'){
+  $key='feng_match_wait_'.hash_hmac('sha256',$_SERVER['REMOTE_ADDR']??'',wp_salt());if(get_transient($key))wp_send_json_error(null,429);set_transient($key,1,3);
+  $token=wp_generate_password(32,false,false);set_transient('feng_match_round_'.$token,time(),HOUR_IN_SECONDS);wp_send_json_success(array('token'=>$token));
+ }
+ if($op!=='match_score')wp_send_json_error(null,400);
+ $token=$_POST['token']??'';$points=$_POST['points']??'';
+ if(!is_string($token)||!preg_match('/^[A-Za-z0-9]{32}$/D',$token)||!is_string($points)||!ctype_digit($points))wp_send_json_error(null,400);
+ $start=get_transient('feng_match_round_'.$token);$seconds=time()-(int)$start;$points=(int)$points;
+ if(!$start||$seconds<10||$points<0||$points>100000||($_POST['moves']??'')!=='30')wp_send_json_error(null,400);
+ delete_transient('feng_match_round_'.$token);$scores[]=array_merge(feng_game_player(),array('points'=>$points,'seconds'=>$seconds));usort($scores,function($a,$b){return $b['points']<=>$a['points']?:$a['seconds']<=>$b['seconds'];});$scores=array_slice($scores,0,10);update_option('feng_match_scores',$scores,false);wp_send_json_success(array('scores'=>$scores));
+}

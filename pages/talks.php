@@ -1,9 +1,10 @@
 <?php
-/** Template Name: Polar · 说说 */
+/** Template Name: ShanYing · 说说 */
 if(!defined('ABSPATH'))exit;
 get_header();while(have_posts()):the_post();$talks=feng_talk_list(); ?>
 <section class="feng-talks xf-container" data-feng-talks data-endpoint="<?php echo esc_url(admin_url('admin-ajax.php')); ?>" data-page-url="<?php echo esc_url(get_permalink()); ?>" data-upload-limit="<?php echo (int)feng_talk_upload_limit(); ?>" data-upload-total="<?php echo (int)feng_talk_total_limit(); ?>" data-upload-label="<?php echo esc_attr(size_format(feng_talk_upload_limit())); ?>">
- <header class="feng-talks-head feng-talk-hero"><small data-talk-total><?php echo (int)$talks['total']; ?> 条</small><div><p class="xf-section-kicker">MOMENTS / 生活的便签</p><h1><i class="fa-solid fa-comment-dots feng-talk-title-icon" aria-hidden="true"></i><?php the_title(); ?></h1><p>不必写成一篇文章，也值得留在这里。</p></div><?php feng_activity_calendar('feng_talk',0,array('days'=>180,'rows'=>5,'hide_heading'=>true,'hide_footer'=>true)); ?></header>
+ <header class="feng-unified-heading"><h1><i class="fa-solid fa-comment-dots feng-page-title-icon" aria-hidden="true"></i><?php the_title(); ?></h1><small data-talk-total><?php echo (int)$talks['total']; ?> 条</small></header>
+ <div class="feng-talk-introduction"><p>不必写成一篇文章，也值得留在这里。</p><?php feng_activity_calendar('feng_talk',0,array('days'=>180,'rows'=>5,'hide_heading'=>true,'hide_footer'=>true)); ?></div>
  <?php if(trim(get_the_content())): ?><div class="xf-prose feng-talk-intro"><?php the_content(); ?></div><?php endif; ?>
  <div class="feng-talk-filter" data-talk-filter hidden><span data-talk-filter-label></span><button type="button" data-talk-clear>查看全部 <?php echo feng_icon('close'); ?></button></div>
  <div class="feng-talk-board" data-talk-board><?php echo $talks['html']; ?></div>

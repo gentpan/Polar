@@ -25,7 +25,7 @@ html.feng-talk-modal-open{background-color:color-mix(in srgb,rgb(28 33 38) 22%,v
 html.feng-talk-modal-open:has(.feng-talk-dialog.is-closing):not(:has(.feng-talk-dialog[open]:not(.is-closing))){background-color:var(--xf-bg);transition-duration:.18s;}
 @media(prefers-reduced-motion:reduce){html:has([data-feng-talks]){transition:none;}}
 
-.feng-talk-dock{transition:bottom .2s ease;}.feng-talk-dock.is-near-footer{bottom:var(--talk-footer-clearance,90px);}@media(prefers-reduced-motion:reduce){.feng-talk-dock{transition:none;}}
+.feng-talk-dock{transition:none;}.feng-talk-dock.is-near-footer{bottom:var(--talk-footer-clearance,90px);}@media(prefers-reduced-motion:reduce){.feng-talk-dock{transition:none;}}
 
 body:has([data-feng-talks]) .xf-footer{opacity:0;visibility:hidden;pointer-events:none;transition:opacity .2s;}body:has([data-feng-talks]) .xf-footer[data-talk-footer-visible]{opacity:1;visibility:visible;pointer-events:auto;}
 
