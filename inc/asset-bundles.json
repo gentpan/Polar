@@ -26,7 +26,6 @@
     "feng-jieqi": "assets/css/jieqi.css",
     "feng-site-extras": "assets/css/site-extras.css",
     "feng-title-font": "https://static.bluecdn.com/fonts/kuaikanshijieti.css",
-    "feng-space-grotesk": "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap",
     "feng-archives": "assets/css/archives.css"
   },
   "scripts": {
@@ -34,8 +33,6 @@
     "feng-navigation": "assets/js/navigation.js",
     "feng-dashboard": "assets/js/dashboard.js",
     "feng-toast": "assets/js/toast.js",
-    "feng-highlight": "assets/vendor/highlight/highlight.min.js",
-    "feng-article-media": "assets/js/article-media.js",
     "feng-friend-avatar": "assets/js/friend-avatar.js",
     "feng-feed": "assets/js/feed.js",
     "feng-music": "assets/js/music.js",

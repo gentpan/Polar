@@ -29,12 +29,7 @@ html[data-xf-theme="dark"] body{background:#0a0a0a}
  </a>
  <nav class="xf-nav" aria-label="<?php esc_attr_e( '主导航', 'feng' ); ?>">
  <?php
- ob_start();
  if ( has_nav_menu( 'primary' ) ) { wp_nav_menu( array( 'theme_location' => 'primary', 'container' => false, 'menu_class' => 'xf-menu', 'fallback_cb' => false ) ); } else { feng_default_menu(); }
- $polar_menu=ob_get_clean();
- $polar_archive='<li class="menu-item'.(is_page_template('pages/archives.php')?' current-menu-item':'').'"><a href="'.esc_url(feng_page_url('archives') ?: home_url('/')).'">存档</a></li>';
- $polar_end=strrpos($polar_menu,'</ul>');
- echo $polar_end!==false?substr_replace($polar_menu,$polar_archive,$polar_end,0):$polar_menu;
  ?>
 
  </nav>

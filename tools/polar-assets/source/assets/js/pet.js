@@ -24,7 +24,7 @@
   panel.style.left=Math.max(8,Math.min(r.left,innerWidth-w-8))+'px';
   panel.style.top=Math.max(8,Math.min(r.top-h-12>=8?r.top-h-12:r.bottom+12,innerHeight-h-8))+'px';
  }
- function place(){if(position){document.body.append(pet);pet.classList.remove('is-perched','is-on-music');pet.classList.add('is-free');movePet(position.x,position.y);faceSide();return;}const music=document.querySelector('[data-feng-music]'),slot=music||document.querySelector('[data-feng-pet-slot]');(slot||document.body).append(pet);pet.classList.toggle('is-perched',!!slot&&!music);pet.classList.toggle('is-on-music',!!music);faceSide();}
+ function place(){if(position){document.body.append(pet);pet.classList.remove('is-perched','is-on-music');pet.classList.add('is-free');movePet(position.x,position.y);faceSide();return;}const music=document.querySelector('[data-travel-page]')?null:document.querySelector('[data-feng-music]'),slot=music||document.querySelector('[data-feng-pet-slot]');(slot||document.body).append(pet);pet.classList.toggle('is-perched',!!slot&&!music);pet.classList.toggle('is-on-music',!!music);faceSide();}
  const localHidden=()=>pet.hasAttribute('data-hide-mobile')&&matchMedia('(max-width:600px)').matches;
  async function api(op,extra={}){
   const abort=new AbortController(),timeout=setTimeout(()=>abort.abort(),op==='chat'?75000:12000);

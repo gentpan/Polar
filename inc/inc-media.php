@@ -114,9 +114,10 @@ add_filter('the_content',function($html){
  },$html);
 },99);
 add_action('wp_enqueue_scripts',function(){
+ if(!is_singular())return;
  wp_enqueue_script('feng-litezoom','https://litezoom.dev/litezoom.min.js',array(),null,array('strategy'=>'defer','in_footer'=>true));
- wp_enqueue_script('feng-highlight',get_theme_file_uri('/assets/vendor/highlight/highlight.min.js'),array(), '11.11.1',true);
- wp_enqueue_script('feng-article-media',get_theme_file_uri('/assets/js/article-media.js'),array('xf-app','feng-litezoom','feng-highlight'),feng_asset_version('/assets/js/article-media.js'),true);
+ wp_enqueue_script('feng-highlight',get_theme_file_uri('/assets/vendor/highlight/highlight.min.js'),array(), '11.11.1',array('strategy'=>'defer','in_footer'=>true));
+ wp_enqueue_script('feng-article-media',get_theme_file_uri('/assets/js/article-media.js'),array('xf-app','feng-litezoom','feng-highlight'),feng_asset_version('/assets/js/article-media.js'),array('strategy'=>'defer','in_footer'=>true));
 });
 ?>
 <?php
@@ -197,22 +198,21 @@ function feng_icon($name, $class = '') {
  return isset($paths[$name])?'<svg class="'.esc_attr('feng-icon feng-icon-'.$name.($class?' '.$class:'')).'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">'.$paths[$name].'</svg>':'';
 }
 function feng_social_links($footer=false) {
- $items=array('github'=>'GitHub','bilibili'=>'哔哩哔哩','weibo'=>'微博','mastodon'=>'Mastodon','telegram'=>'Telegram','email'=>'电子邮箱','rss'=>'RSS 订阅');
+ $items=array('github'=>'GitHub','x'=>'X / Twitter','bilibili'=>'哔哩哔哩','weibo'=>'微博','mastodon'=>'Mastodon','telegram'=>'Telegram','email'=>'电子邮箱','rss'=>'RSS 订阅');
  $html='';
- if($footer){unset($items['email'],$items['rss']);$items['x']='X / Twitter';}
+ $icons=array('github'=>'fa-brands fa-github','x'=>'fa-brands fa-x-twitter','bilibili'=>'fa-brands fa-bilibili','weibo'=>'fa-brands fa-weibo','mastodon'=>'fa-brands fa-mastodon','telegram'=>'fa-brands fa-telegram','email'=>'fa-solid fa-envelope','rss'=>'fa-solid fa-rss');
+ if($footer){unset($items['email'],$items['rss']);}
  foreach($items as $key=>$label) {
   $url=$key==='rss'?(feng_setting('social_rss',true)?get_feed_link():''):feng_setting('social_'.$key,'');
-  if($footer && $key==='github')$url='https://github.com/gentpan';
-  if($footer && $key==='x')$url='https://x.com/gentpan';
   if($key==='email' && $url) $url='mailto:'.sanitize_email($url);
   if(!$url) continue;
-  $html.='<a href="'.esc_url($url).'" aria-label="'.esc_attr($label).'" title="'.esc_attr($label).'"'.(!in_array($key,array('rss','email'),true)?' target="_blank" rel="me noopener noreferrer"':'').'>'.feng_icon($key).'</a>';
+  $html.='<a href="'.esc_url($url).'" aria-label="'.esc_attr($label).'" title="'.esc_attr($label).'"'.(!in_array($key,array('rss','email'),true)?' target="_blank" rel="me noopener noreferrer"':'').'>'.'<i class="feng-icon feng-fa '.esc_attr($icons[$key]).'" aria-hidden="true"></i></a>';
  }
  if($footer){
   foreach(array(array('https://www.travellings.cn/go.html','开往 · 随机访问博客','train'),array('https://www.foreverblog.cn/go.html','十年之约 · 随机访问博客','blog')) as $link){
    $html.='<a href="'.esc_url($link[0]).'" target="_blank" rel="noopener noreferrer" aria-label="'.esc_attr($link[1]).'" title="'.esc_attr($link[1]).'"><i class="feng-icon feng-fa fa-solid fa-'.esc_attr($link[2]).'" aria-hidden="true"></i></a>';
   }
  }
- if($footer && feng_setting('social_rss',true))$html.='<a href="'.esc_url(get_feed_link()).'" aria-label="RSS 订阅" title="RSS 订阅">'.feng_icon('rss').'</a>';
+ if($footer && feng_setting('social_rss',true))$html.='<a href="'.esc_url(get_feed_link()).'" aria-label="RSS 订阅" title="RSS 订阅">'.'<i class="feng-icon feng-fa fa-solid fa-rss" aria-hidden="true"></i></a>';
  if($html) echo '<nav class="feng-social" aria-label="社交与订阅">'.$html.'</nav>';
 }

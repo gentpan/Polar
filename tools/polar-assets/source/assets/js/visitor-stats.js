@@ -22,7 +22,9 @@
    }catch{for(const el of document.querySelectorAll('[data-footer-online]'))el.textContent='—';}finally{clearTimeout(timer);}
   });
  }
- document.addEventListener('xf:mounted',()=>ping(uuid()));
+ const boot=()=>ping(uuid());
+ document.addEventListener('xf:mounted',boot);
  document.addEventListener('visibilitychange',()=>{if(!document.hidden)ping();});
- setInterval(()=>{if(!document.hidden)ping();},60000);ping(uuid());
+ setInterval(()=>{if(!document.hidden)ping();},60000);
+ if('requestIdleCallback' in window)requestIdleCallback(boot,{timeout:3000});else setTimeout(boot,1500);
 })();

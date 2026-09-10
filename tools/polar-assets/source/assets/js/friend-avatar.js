@@ -161,3 +161,26 @@ document.addEventListener('pointerout',event=>{if(event.pointerType==='touch')re
  }
  document.addEventListener('xf:mounted',mount);document.addEventListener('xf:before-unmount',()=>cleanup());if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount,{once:true});else mount();
 })();
+
+/* The compact avatar wall has its own information tooltip. */
+(() => {
+ let tip,active;
+ const hide=()=>{tip?.remove();tip=null;active=null;};
+ const show=link=>{
+  if(active===link)return;hide();active=link;
+  tip=document.createElement('div');tip.className='feng-wall-tooltip';tip.setAttribute('role','tooltip');
+  const name=document.createElement('strong'),description=document.createElement('span');
+  name.textContent=link.dataset.name||'';description.textContent=link.dataset.description||'';
+  tip.append(name);if(description.textContent)tip.append(description);document.body.append(tip);
+  const r=link.getBoundingClientRect(),t=tip.getBoundingClientRect();
+  tip.style.left=Math.max(8,Math.min(innerWidth-t.width-8,r.left+r.width/2-t.width/2))+'px';
+  tip.style.top=Math.max(8,r.top>=t.height+12?r.top-t.height-8:Math.min(innerHeight-t.height-8,r.bottom+8))+'px';
+ };
+ document.addEventListener('pointerover',e=>{const link=e.target.closest('.feng-friend-wall>a[data-game-friend]');if(link&&e.pointerType!=='touch')show(link);});
+ document.addEventListener('pointerout',e=>{if(active&&active.contains(e.target)&&!active.contains(e.relatedTarget))hide();});
+ document.addEventListener('focusin',e=>{const link=e.target.closest('.feng-friend-wall>a[data-game-friend]');if(link)show(link);});
+ document.addEventListener('focusout',hide);
+ document.addEventListener('keydown',e=>{if(e.key==='Escape')hide();});
+ document.addEventListener('scroll',hide,true);window.addEventListener('resize',hide);
+ document.addEventListener('xf:before-unmount',hide);
+})();

@@ -64,7 +64,8 @@
    if(operation==='summary'){document.getElementById('feng-ai-summary').value=data;generatedSummary=true;}
    if(operation==='keywords')document.getElementById('feng-ai-keywords').value=data.join('，');
    if(operation==='cover'){cover=data;panel.querySelector('img').src=data.url;panel.querySelector('[data-ai-media-link]').href=data.editUrl;if(blockEditor())await wp.data.dispatch('core/editor').editPost({featured_media:data.id});else if(window.wp?.media?.featuredImage)wp.media.featuredImage.set(data.id);}
-   status(editor,operation==='cover'?'WebP 封面已保存，并自动设为特色图片。':'生成完成。可在预览中调整，再点击应用。');
+   if(operation==='cover')status(editor,'WebP 封面已保存，并自动设为特色图片。');
+   else editor.querySelector('[data-ai-apply="'+operation+'"]')?.click();
   }catch(error){status(editor,error.message,true);}
  }));
  async function tagIds(names){

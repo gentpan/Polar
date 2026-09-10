@@ -21,7 +21,7 @@ function mount(){
   const kind=button.dataset.lordiconContent||(button.matches('.comment-reply-link')?'reply':'');
   if(!(kind in animations))return;
   const host=document.createElement('span');host.className='feng-lordicon-content';host.setAttribute('aria-hidden','true');button.prepend(host);
-  const trigger=button.closest('button,a,.feng-footer-copyright,.feng-copyright-rule')||button;
+  const trigger=(kind==='siteactivity'?button.closest('.feng-profile-calendar'):button.closest('button,a,.feng-footer-copyright,.feng-copyright-rule'))||button;
   const reveal=['pageprev','pagenext','relatedrefresh','articlelink'].includes(kind);
   const restAtEnd=reveal||kind==='siteactivity';
   let player:any=null,hovered=false;

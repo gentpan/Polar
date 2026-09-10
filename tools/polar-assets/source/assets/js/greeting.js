@@ -43,31 +43,52 @@
    dateRow.textContent=`${solar}${lunar} · ${weekday}`;
   };
   updateDate();root.addEventListener('pointerenter',updateDate,{signal});root.addEventListener('toggle',updateDate,{signal});
+  const localPreview=location.hostname==='localhost'||location.hostname.endsWith('.local')||['127.0.0.1','[::1]'].includes(location.hostname);
+  async function browserWeather(){
+   const geoResponse=await fetch('https://ipwho.is/?fields=success,city,country_code,latitude,longitude',{signal,cache:'no-store',credentials:'omit'});
+   if(!geoResponse.ok)throw Error('Location unavailable');
+   const geo=await geoResponse.json();
+   if(!geo.success||!Number.isFinite(geo.latitude)||!Number.isFinite(geo.longitude))throw Error('Invalid location');
+   const url=new URL('https://api.open-meteo.com/v1/forecast');
+   url.search=new URLSearchParams({latitude:geo.latitude.toFixed(2),longitude:geo.longitude.toFixed(2),current:'temperature_2m,weather_code,is_day',daily:'sunrise,sunset',forecast_days:'2',timeformat:'unixtime',timezone:'auto'});
+   const response=await fetch(url,{signal,cache:'no-store',credentials:'omit'});if(!response.ok)throw Error('Weather unavailable');
+   const data=await response.json(),c=data.current;if(!Number.isFinite(c?.temperature_2m))throw Error('Invalid weather');
+   return {success:true,data:{city:geo.city,latitude:geo.latitude,longitude:geo.longitude,country_code:geo.country_code,temperature:Math.round(c.temperature_2m),code:c.weather_code,day:!!c.is_day,time:c.time,timezone:data.timezone,utc_offset:data.utc_offset_seconds,sunrise:data.daily.sunrise,sunset:data.daily.sunset}};
+  }
   const timer=setTimeout(()=>currentController.abort(),22000);
   let visitorReady=false;
   const load=async kind=>{
    try{
     const url=new URL(root.dataset.endpoint,location.href);url.searchParams.set('action','feng_weather');url.searchParams.set('kind',kind);
-    const response=await fetch(url,{signal,cache:'no-store',credentials:'same-origin'});const result=await response.json();const w=result.data;
+    const result=localPreview&&kind==='visitor'?await browserWeather():await fetch(url,{signal,cache:'no-store',credentials:'same-origin'}).then(response=>response.json());const w=result.data;
     if(signal.aborted||!root.isConnected||!result.success||!w||!Number.isFinite(w.temperature))return;
     const label=describe(w.code),row=root.querySelector('[data-weather-'+kind+']');row.textContent=`${w.city} · ${label} · ${w.temperature}°C`;
     if(kind==='visitor'||!visitorReady){root.querySelectorAll('[data-weather-host],[data-weather-visitor]').forEach(item=>{item.hidden=item!==row;});root.dataset.weather=label==='晴'?(w.day?'sun':'moon'):label==='雪'?'snow':['雨','雷雨'].includes(label)?'rain':'cloud';root.querySelector('summary').setAttribute('aria-label',`查看天气：${w.city}，${label}，${w.temperature}摄氏度`);}
     if(kind==='visitor'){visitorReady=true;document.dispatchEvent(new CustomEvent('polar:visitor-weather',{detail:w}));}root.hidden=false;
-   }catch{/* Quietly retain the other location if this lookup is unavailable. */}
+   }catch{
+    if(localPreview&&!signal.aborted&&root.isConnected){const row=root.querySelector('[data-weather-visitor]');row.textContent='公网定位或天气暂不可用，请刷新重试';row.hidden=false;root.hidden=false;root.querySelector('[data-weather-host]').hidden=true;}
+   }
   };
   const enter=()=>{if(matchMedia('(hover:hover)').matches)root.open=true;};
   root.addEventListener('pointerenter',enter,{signal});root.addEventListener('pointerleave',()=>{if(!root.contains(document.activeElement))root.open=false;},{signal});
   document.addEventListener('pointerdown',e=>{if(!root.contains(e.target))root.open=false;},{signal});
   root.addEventListener('keydown',e=>{if(e.key==='Escape'){root.open=false;root.querySelector('summary').focus();}},{signal});
-  await Promise.all([load('host'),...(root.dataset.visitor==='true'?[load('visitor')]:[])]);clearTimeout(timer);
+  await Promise.all(localPreview?(root.dataset.visitor==='true'?[load('visitor')]:[]):[load('host'),...(root.dataset.visitor==='true'?[load('visitor')]:[])]);clearTimeout(timer);
  }
  document.addEventListener('xf:mounted',mountWeather);document.addEventListener('xf:before-unmount',()=>controller?.abort());
  setInterval(()=>{if(!document.hidden&&document.querySelector('[data-hero-weather]'))mountWeather();},1200000);mountWeather();
 })();
 
 
-/* Pure scene resolver: real solar times when available, local clock otherwise. */
+/* Celestial positions use visitor IP coordinates and the current instant. */
 // SunCalc 1.9 uses radians. Panorama: N at edges, E 25%, S 50%, W 75%.
+function polarSunState(now, weather) {
+ const lat=weather?.latitude,lon=weather?.longitude;
+ if(!Number.isFinite(lat)||!Number.isFinite(lon)||Math.abs(lat)>90||Math.abs(lon)>180)return null;
+ const p=SunCalc.getPosition(now,lat,lon);
+ const azimuth=(p.azimuth*180/Math.PI+540)%360,altitude=p.altitude*180/Math.PI;
+ return {visible:altitude>0,azimuth,altitude,x:azimuth/360*100,y:32-Math.max(0,altitude)/90*29};
+}
 function polarMoonState(now, weather) {
  const lat=weather?.latitude,lon=weather?.longitude;
  if(!Number.isFinite(lat)||!Number.isFinite(lon)||Math.abs(lat)>90||Math.abs(lon)>180)return null;
@@ -84,7 +105,8 @@ function polarPaintMoon(canvas, moon) {
  for(let y=0;y<size;y++)for(let x=0;x<size;x++){
   const nx=(x+.5-size/2)/r,ny=(y+.5-size/2)/r,d=nx*nx+ny*ny;if(d>1)continue;
   const nz=Math.sqrt(1-d),lit=nx*lx+ny*ly+nz*z>0,i=(y*size+x)*4;
-  data.data[i]=lit?237:28;data.data[i+1]=lit?244:36;data.data[i+2]=lit?255:49;
+  if(!lit)continue; // Let the sky show through the unlit lunar surface.
+  data.data[i]=237;data.data[i+1]=244;data.data[i+2]=255;
   data.data[i+3]=Math.round(Math.min(1,(1-Math.sqrt(d))*r)*255);
  }
  ctx.putImageData(data,0,0);
@@ -130,17 +152,23 @@ window.polarVisitorNight=(weather)=>polarHeroSceneState(new Date(),weather).nigh
   const next=base.cloneNode();next.removeAttribute('src');next.classList.add('polar-scene-image');base.classList.add('polar-scene-image');base.after(next);
   base.style.opacity='1';next.style.opacity='0';
   const atmosphere=document.createElement('div');atmosphere.className='polar-scene-atmosphere';atmosphere.setAttribute('aria-hidden','true');
-  const orb=document.createElement('span');orb.className='polar-scene-orb';atmosphere.append(orb);
+  const orb=document.createElement('span');orb.className='polar-scene-orb';orb.hidden=true;atmosphere.append(orb);
   const moon=document.createElement('canvas');moon.width=moon.height=96;moon.className='polar-scene-moon';moon.hidden=true;atmosphere.append(moon);
   const clouds=document.createElement('span');clouds.className='polar-scene-clouds';atmosphere.append(clouds);
   const particles=document.createElement('div');particles.className='polar-scene-particles';
   for(let i=0;i<36;i++){const drop=document.createElement('i');drop.style.setProperty('--x',`${(i*37)%100}%`);drop.style.setProperty('--delay',`${-i*.37}s`);drop.style.setProperty('--speed',`${.65+(i%7)*.12}s`);particles.append(drop);}atmosphere.append(particles);hero.prepend(atmosphere);
   let weather=null,current='',generation=0,front=base,visible=true;
+  try{const cached=JSON.parse(localStorage.getItem('polar-visitor-weather')||sessionStorage.getItem('polar-visitor-weather'));if(cached&&Date.now()-cached.at<3600000)weather=cached.weather;}catch{}
   const preview=hero.dataset.scenePreview||'auto';
-  function paintState(state){hero.dataset.scene=state.scene;hero.dataset.scenePhase=state.phase;hero.dataset.sceneNight=String(state.night);hero.dataset.sceneCondition=state.condition;orb.style.left=state.x+'%';orb.style.top=state.y+'%';orb.hidden=state.night;
-   const lunar=polarMoonState(new Date(),weather);moon.hidden=!lunar?.visible;
+  function paintState(state){hero.dataset.scene=state.scene;hero.dataset.scenePhase=state.phase;hero.dataset.sceneNight=String(state.night);hero.dataset.sceneCondition=state.condition;const sun=polarSunState(new Date(),weather);
+   const position=preview==='auto'?sun:state;
+   orb.hidden=state.night||!position||(preview==='auto'&&!sun.visible);
+   if(position){orb.style.left=position.x+'%';orb.style.top=position.y+'%';}
+   if(sun){hero.dataset.sunAzimuth=sun.azimuth.toFixed(1);hero.dataset.sunAltitude=sun.altitude.toFixed(1);}
+
+   const lunar=polarMoonState(new Date(),weather);moon.hidden=!state.night||!lunar?.visible;
    if(lunar){hero.dataset.moonAzimuth=lunar.azimuth.toFixed(1);hero.dataset.moonAltitude=lunar.altitude.toFixed(1);
-    if(lunar.visible){moon.style.left=lunar.x+'%';moon.style.top=lunar.y+'%';polarPaintMoon(moon,lunar);}
+    if(state.night&&lunar.visible){moon.style.left=lunar.x+'%';moon.style.top=lunar.y+'%';polarPaintMoon(moon,lunar);}
    }
   }
   async function render(){

@@ -54,7 +54,7 @@
 #side-sortables #feng-ai-editor-tools,#side-sortables [data-travel-editor]{font-size:12px;line-height:1.65;}
 #side-sortables #feng-ai-editor-tools>p:first-of-type,#side-sortables [data-travel-editor]>p:first-child{color:#646970;}
 #side-sortables .feng-ai-actions{display:grid;grid-template-columns:1fr;gap:6px;}
-#side-sortables #feng-ai-editor-tools select,#side-sortables [data-travel-editor] input:not([type=hidden]),#side-sortables [data-travel-editor] select{width:100%;max-width:100%;box-sizing:border-box;}
+#side-sortables #feng-ai-editor-tools select,#side-sortables [data-travel-editor] input:not([type=hidden]):not([type=checkbox]):not([type=radio]),#side-sortables [data-travel-editor] select{width:100%;max-width:100%;box-sizing:border-box;}
 #side-sortables #feng-ai-editor-tools .button,#side-sortables [data-place-search]{width:100%;margin-top:6px;white-space:normal;}
 #side-sortables .feng-ai-result{padding:10px;border-radius:6px;background:#f6f7f7;}
 #side-sortables .feng-ai-result img{border-radius:4px;}

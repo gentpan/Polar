@@ -179,16 +179,16 @@
 .xf-prose img:not(.feng-link-favicon):not(.emoji):not([data-article-lazy]):not(.feng-article-loading img){box-sizing:border-box;padding:clamp(6px,.8vw,10px);background:var(--feng-image-matte,#fff);border:0;box-shadow:none;border-radius:14px;object-fit:contain;}
 .xf-prose .feng-external-arrow{display:inline-block;width:1em;height:1em;margin-left:3px;vertical-align:-.12em;fill:currentColor;opacity:.75;}
 /* Quiet inline links with consistent baseline and breathing room. */
-.xf-prose a.feng-external-link{color:var(--xf-text);text-decoration:none;border:0;background:none;box-shadow:none;margin-inline:.12em;transition:color .2s;}
-.xf-prose a.feng-external-link:hover,.xf-prose a.feng-external-link:focus-visible{color:var(--xf-accent);text-decoration:none;background:none;box-shadow:none;}
+.xf-prose a.feng-external-link{color:var(--xf-accent);font-weight:600;text-decoration:none;text-underline-offset:.2em;text-decoration-thickness:1px;border:0;background:none;box-shadow:none;margin-inline:.12em;transition:color .2s;}
+.xf-prose a.feng-external-link:hover,.xf-prose a.feng-external-link:focus-visible{color:var(--xf-accent);text-decoration:underline;background:none;box-shadow:none;}
 .xf-prose a.feng-external-link .feng-link-favicon{width:.8em;height:.8em;max-width:.8em;margin:0 .3em 0 0;padding:0;background:transparent;border:0;border-radius:0;vertical-align:-.06em;box-shadow:none;}
-.xf-prose a.feng-external-link .feng-external-arrow{width:.7em;height:.7em;margin-left:.2em;vertical-align:.03em;opacity:.45;}
+.xf-prose a.feng-external-link .feng-external-arrow{display:inline-flex;align-items:center;justify-content:center;position:static;width:.85em;height:.85em;font-size:1em;line-height:1;margin-left:.2em;vertical-align:-.12em;opacity:.75;}
 .xf-prose a.feng-external-link:hover .feng-external-arrow{opacity:.85;}
 @media(prefers-reduced-motion:reduce){.xf-prose a.feng-external-link{transition:none;}}
 /* A quiet closing stamp between the story and its attribution. */
 .feng-article-end{display:flex;align-items:center;justify-content:center;gap:18px;margin:4px auto 30px;color:#bc6666;}
 .feng-article-end::before,.feng-article-end::after{content:"";width:clamp(36px,8vw,88px);height:1px;background:currentColor;opacity:.2;}
-.feng-article-end>span{display:grid;place-items:center;width:48px;height:48px;border:1px solid color-mix(in srgb,currentColor 35%,transparent);border-radius:50%;background:color-mix(in srgb,currentColor 5%,transparent);font-family:"Space Grotesk",sans-serif;font-size:11px;font-weight:500;letter-spacing:.16em;text-indent:.16em;opacity:.7;transform:rotate(-10deg);user-select:none;}
+.feng-article-end>span{display:grid;place-items:center;width:48px;height:48px;border:1px solid color-mix(in srgb,currentColor 35%,transparent);border-radius:50%;background:color-mix(in srgb,currentColor 5%,transparent);font-family:var(--xf-font);font-size:11px;font-weight:500;letter-spacing:.16em;text-indent:.16em;opacity:.7;transform:rotate(-10deg);user-select:none;}
 :root[data-xf-theme="dark"] .feng-article-end{color:#ce8c8c;}
 
 .single-post .xf-article-footer{padding-top:18px;}
@@ -196,3 +196,18 @@
 .feng-external-arrow[data-lordicon-content]>svg{width:100%;height:100%;display:block;}
 .feng-external-arrow.has-lordicon-content>svg{display:none;}
 .feng-external-arrow>.feng-lordicon-content{width:100%;height:100%;vertical-align:top;}
+
+/* Article, recommendations and discussion share one outer card surface. */
+.single-post{--shanying-reading-card-border:var(--xf-line);--shanying-reading-card-shadow:0 8px 28px rgb(20 24 35 / .035);}
+:root[data-xf-theme=dark] .single-post{--shanying-reading-card-shadow:0 8px 28px rgb(0 0 0 / .16);}
+.single-post #xf-content :is(.xf-article,.feng-reading-related,.feng-comment-panel){box-sizing:border-box;background:var(--feng-paper);border:1px solid var(--shanying-reading-card-border);border-radius:0;box-shadow:var(--shanying-reading-card-shadow);backdrop-filter:none;-webkit-backdrop-filter:none;}
+
+/* Keep the metadata and action pills clear of the cover's curved lower edge. */
+.single-post .feng-entry-hero.xf-reading-cover--image{padding-bottom:36px;}
+@media(max-width:700px){.single-post .feng-entry-hero.xf-reading-cover--image{padding-bottom:32px;}}
+
+.feng-link-preview{position:fixed;z-index:1000;width:min(300px,calc(100vw - 24px));overflow:hidden;border:1px solid var(--xf-line);border-radius:12px;background:var(--xf-surface);color:var(--xf-text);box-shadow:0 10px 32px #0003;pointer-events:none;}
+.feng-link-preview[hidden]{display:none;}
+.feng-link-preview img{display:block;width:100%;height:188px;object-fit:cover;object-position:top;background:var(--xf-soft);}
+.feng-link-preview img[hidden]{display:none;}
+.feng-link-preview>div{padding:10px 14px;font-size:12px;line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--xf-muted);}

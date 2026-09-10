@@ -14,3 +14,12 @@ for(const s of hours){assert.ok(s.x>=0&&s.x<100);assert.ok(s.y>=3&&s.y<=32);}
 const a=state(new Date('2026-09-09T12:00:00Z'),place),b=state(new Date('2026-09-09T12:00:00Z'),{latitude:-33.9,longitude:151.2});
 assert.ok(Math.abs(a.altitude-b.altitude)>10);assert.notEqual(a.rotation,b.rotation);
 console.log('Moon tests passed: known phases, horizon, coordinates and observer orientation.');
+
+const paint=vm.runInNewContext('('+source.slice(source.indexOf('function polarPaintMoon('),source.indexOf('function polarHeroSceneState('))+')');
+function disk(fraction){let pixels;const context={createImageData:(w,h)=>({data:new Uint8ClampedArray(w*h*4)}),putImageData:data=>pixels=data.data};paint({getContext:()=>context},{fraction,rotation:0});return pixels;}
+function visiblePixels(data){let n=0;for(let i=3;i<data.length;i+=4)if(data[i])n++;return n;}
+assert.equal(visiblePixels(disk(0)),0,'New moon must not paint a black disk');
+assert.ok(visiblePixels(disk(1))>6000,'Full moon remains visible');
+const crescent=disk(.05);assert.ok(visiblePixels(crescent)>0&&visiblePixels(crescent)<500,'Only the illuminated crescent is drawn');
+assert.equal(crescent[(48*96+48)*4+3],0,'Dark center remains transparent');
+console.log('Moon rendering passed: transparent dark side, crescent and full moon.');

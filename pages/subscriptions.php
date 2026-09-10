@@ -6,7 +6,7 @@ if(post_password_required()) { echo '<section class="feng-panel">'.get_the_passw
 $data=feng_feed_data(); $list=feng_feed_list(); $cycle=$data['cycle'];
 ?>
 <div class="feng-panel feng-special-page feng-subscriptions" data-feed-page>
-<header class="feng-page-heading feng-feed-hero feng-unified-heading" data-xf-reveal>
+<header class="feng-page-heading feng-feed-hero feng-unified-heading">
 <div class="feng-feed-hero-copy"><h1><?php echo feng_page_title_icon(); the_title(); ?></h1></div>
 <div class="feng-feed-overview"><span><?php echo feng_icon('rss'); ?> <strong><?php echo count($data['sources']); ?></strong> 个订阅</span><span><strong data-feed-today-number><?php echo (int)$data['today']; ?></strong> 篇今日更新</span><span class="feng-feed-last-sync"><?php echo feng_icon('clock'); ?> <span><?php echo !empty($cycle['finished'])?esc_html('上次同步 '.wp_date('Y-m-d H:i',$cycle['finished'])):'尚未同步'; ?></span></span></div>
 </header>

@@ -14,5 +14,6 @@
  document.addEventListener('click',event=>{if(!event.target.closest('[data-jieqi-toggle]'))return;disabled=!disabled;try{localStorage.setItem(key,disabled?'1':'0');}catch{}update();});
  window.addEventListener('storage',event=>{if(event.key===key||event.key===null){disabled=event.key===null?false:event.newValue==='1';update();}});
  document.addEventListener('xf:mounted',sync);
- update();
+ const boot=()=>update();
+ if('requestIdleCallback' in window)requestIdleCallback(boot,{timeout:4000});else window.addEventListener('load',()=>setTimeout(boot,1),{once:true});
 })();

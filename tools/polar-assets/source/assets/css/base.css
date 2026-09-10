@@ -1,6 +1,6 @@
 /* FENG base components. WordPress-generated selectors only appear in compatibility rules. */
 *, *::before, *::after { box-sizing: border-box; }
-html { scroll-padding-top: 120px; scrollbar-gutter: stable both-edges; }
+html { scroll-padding-top: 120px; scrollbar-gutter: stable; }
 /* Keep centered content stationary across short pages and modal scroll locks.
    The reserved space uses the page background; overlay scrollbars need no space. */
 @supports not (scrollbar-gutter: stable) {
@@ -247,3 +247,11 @@ dialog::backdrop { background: rgb(15 17 26 / .4); }
 .xf-global-loading[data-xf-loading]{visibility:visible;opacity:1;}
 .xf-global-loading svg{width:36px;height:36px;filter:drop-shadow(0 2px 8px rgb(0 0 0 / .08));}
 @media(prefers-reduced-motion:reduce){.xf-global-loading{transition:none;}.xf-global-loading svg{display:none;}.xf-global-loading::after{content:"加载中…";font-size:13px;}}
+
+/* Modal backdrops cover the whole web viewport, including both gutter edges. */
+html:has(dialog:modal){overflow:hidden;scrollbar-gutter:stable;}
+html:has(dialog:modal) body{overflow:hidden;}
+dialog:modal::backdrop{position:fixed;inset:0;margin:0;width:auto;height:auto;max-width:none;max-height:none;box-shadow:0 0 0 100vmax var(--feng-modal-shade,rgb(15 17 26 / .4));}
+dialog:is(.feng-friend-info,.feng-friend-apply)::backdrop{--feng-modal-shade:rgb(0 0 0 / .35);}
+dialog.feng-self-edit-dialog::backdrop{--feng-modal-shade:#0006;}
+dialog.xf-lightbox::backdrop{--feng-modal-shade:rgb(10 11 16 / .95);}

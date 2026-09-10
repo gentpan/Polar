@@ -16,7 +16,12 @@ function feng_travel_clean($v){
 }
 function feng_travel_badge($id){$v=feng_travel_location($id);if(empty($v['city'])&&empty($v['country']))return '';return '<span class="feng-travel-badge">'.(!empty($v['code'])?'<img src="'.esc_url('https://flagcdn.io/flags/4x3/'.$v['code'].'.svg').'" width="24" height="18" alt="'.esc_attr($v['country']??'').'" loading="lazy">':'').'<span>'.esc_html(implode(' · ',array_filter(array($v['city']??'',$v['country']??'')))).'</span></span>';}
 add_action('add_meta_boxes_post',function(){add_meta_box('feng-travel','旅行足迹','feng_travel_box','post','side','default');});
-function feng_travel_box($post){$v=feng_travel_location($post->ID);wp_nonce_field('feng_travel_save','feng_travel_nonce'); ?>
+function feng_travel_box($post){
+ wp_nonce_field('feng_travel_save','feng_travel_nonce');
+ $flag=get_post_meta($post->ID,'_feng_footprint',true);$v=feng_travel_location($post->ID);
+ echo '<p><label><input type="checkbox" name="feng_footprint" value="1" '.checked($flag==='1'||($flag===''&&(has_category('travel',$post)||isset($v['lat'],$v['lng'])||!empty($v['place_id']))),true,false).'> 收录到足迹页面</label></p><p class="description">保存文章后，在「文章 → 足迹」配置地点和旅行日期。</p>';
+}
+function feng_travel_details_box($post){$v=feng_travel_location($post->ID);wp_nonce_field('feng_travel_save','feng_travel_nonce'); ?>
 <div data-travel-editor data-post="<?php echo (int)$post->ID; ?>" data-nonce="<?php echo esc_attr(wp_create_nonce('feng_travel_search')); ?>" data-endpoint="<?php echo esc_url(admin_url('admin-ajax.php')); ?>">
 <p><label><input type="checkbox" name="feng_footprint" value="1" <?php $flag=get_post_meta($post->ID,'_feng_footprint',true);checked($flag==='1'||($flag===''&&(has_category('travel',$post)||isset($v['lat'],$v['lng'])||!empty($v['place_id'])))); ?>> 收录到足迹页面</label></p><p>任何分类的文章都可以收录。手动坐标请指定坐标系；搜索结果会自动标记来源。切换地图服务后，原服务专属搜索结果需要重新选点。</p>
 <p><label for="feng-place-query">搜索城市或地址</label> <input id="feng-place-query" type="search" data-place-query placeholder="例如：曼谷，泰国"> <button class="button" type="button" data-place-search>搜索地点</button></p><p data-place-status role="status"></p><div data-place-results></div>
@@ -24,7 +29,8 @@ function feng_travel_box($post){$v=feng_travel_location($post->ID);wp_nonce_fiel
 <p><label for="feng-travel-date-start">旅行开始日期</label><br><input type="date" id="feng-travel-date-start" name="feng_travel[date_start]" value="<?php echo esc_attr($v['date_start']??''); ?>"> <label for="feng-travel-date-end">结束日期（可选）</label> <input type="date" id="feng-travel-date-end" name="feng_travel[date_end]" value="<?php echo esc_attr($v['date_end']??''); ?>"></p><p class="description">填写实际旅行日期，与文章发布日期无关。单日旅行只填开始日期；结束日期不能早于开始日期，留空不显示。</p>
 <input type="hidden" name="feng_travel[source]" value="<?php echo esc_attr($v['source']??'manual'); ?>"><input type="hidden" name="feng_travel[place_id]" value="<?php echo esc_attr($v['place_id']??''); ?>"><p><label>坐标系 <select name="feng_travel[crs]"><option value="wgs84" <?php selected($v['crs']??'wgs84','wgs84'); ?>>WGS84 / GPS</option><option value="gcj02" <?php selected($v['crs']??'','gcj02'); ?>>GCJ-02 / 高德</option></select></label></p><p>搜索后点击候选地点填入字段，再保存文章。填写地点名称即可显示国旗地点；地图标记需要有效经纬度，或通过 Google 搜索选择的地点 ID。</p></div>
 <?php }
-add_action('save_post_post',function($id){if(wp_is_post_revision($id)||wp_is_post_autosave($id)||!current_user_can('edit_post',$id)||empty($_POST['feng_travel_nonce'])||!wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['feng_travel_nonce'])),'feng_travel_save'))return;$v=isset($_POST['feng_travel'])&&is_array($_POST['feng_travel'])?wp_unslash($_POST['feng_travel']):array();foreach($v as $x)if(!is_scalar($x))return;$clean=feng_travel_clean($v);if($clean['source']==='google'&&$clean['place_id']){$clean['lat']=null;$clean['lng']=null;}update_post_meta($id,'_feng_travel',$clean);update_post_meta($id,'_feng_footprint',isset($_POST['feng_footprint'])?'1':'0');});
+function feng_travel_save_post($id){if(wp_is_post_revision($id)||wp_is_post_autosave($id)||!current_user_can('edit_post',$id)||empty($_POST['feng_travel_nonce'])||!wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['feng_travel_nonce'])),'feng_travel_save'))return;$v=isset($_POST['feng_travel'])&&is_array($_POST['feng_travel'])?wp_unslash($_POST['feng_travel']):array();foreach($v as $x)if(!is_scalar($x))return;$clean=feng_travel_clean($v);if($clean['source']==='google'&&$clean['place_id']){$clean['lat']=null;$clean['lng']=null;}if(isset($_POST['feng_travel']))update_post_meta($id,'_feng_travel',$clean);update_post_meta($id,'_feng_footprint',isset($_POST['feng_footprint'])?'1':'0');}
+add_action('save_post_post','feng_travel_save_post');
 add_action('admin_menu',function(){add_submenu_page('edit.php','旅行足迹','足迹','manage_options','feng-travel','feng_travel_admin');});
 function feng_map_settings_screen(){
  if(!current_user_can('manage_options'))return;
@@ -46,10 +52,15 @@ function feng_map_settings_screen(){
 }
 function feng_travel_admin(){
  if(!current_user_can('manage_options'))return;
+ $edit_id=absint($_GET['footprint_post']??0);
+ if($edit_id&&get_post_type($edit_id)==='post'&&current_user_can('edit_post',$edit_id)){
+  if(isset($_POST['feng_travel_nonce'])){check_admin_referer('feng_travel_save','feng_travel_nonce');feng_travel_save_post($edit_id);echo '<div class="notice notice-success"><p>足迹资料已保存。</p></div>';}
+  echo '<div class="wrap"><h1>配置旅行足迹</h1><h2>'.esc_html(get_the_title($edit_id)).'</h2><form method="post">';feng_travel_details_box(get_post($edit_id));submit_button('保存足迹');echo '</form></div>';return;
+ }
  $term=get_page_by_path('footprint');echo '<div class="wrap"><h1>旅行足迹</h1>';
- if($term){echo '<p><a class="button" href="'.esc_url(get_permalink($term)).'">查看旅行页面</a> <a class="button" href="'.esc_url(admin_url('edit.php')).'">管理旅行文章</a></p><table class="widefat striped"><thead><tr><th>文章</th><th>地点</th><th>地图坐标</th></tr></thead><tbody>';foreach(feng_footprint_posts(array('publish','draft','pending','private')) as $p){$v=feng_travel_location($p->ID);echo '<tr><td><a href="'.esc_url(get_edit_post_link($p->ID)).'">'.esc_html($p->post_title).'</a></td><td>'.esc_html(trim(($v['city']??'').' '.($v['country']??''))).'</td><td>'.esc_html(isset($v['lat'],$v['lng'])?$v['lat'].', '.$v['lng']:'待填写').'</td></tr>';}echo '</tbody></table>'; }echo '</div>';
+ {echo '<p><a class="button" href="'.esc_url($term?get_permalink($term):home_url('/footprint/')).'">查看旅行页面</a> <a class="button" href="'.esc_url(admin_url('edit.php')).'">管理旅行文章</a></p><table class="widefat striped"><thead><tr><th>文章</th><th>地点</th><th>地图坐标</th></tr></thead><tbody>';foreach(feng_footprint_posts(array('publish','draft','pending','private')) as $p){$v=feng_travel_location($p->ID);echo '<tr><td><a href="'.esc_url(admin_url('edit.php?page=feng-travel&footprint_post='.$p->ID)).'">'.esc_html($p->post_title).'</a></td><td>'.esc_html(trim(($v['city']??'').' '.($v['country']??''))).'</td><td>'.esc_html(isset($v['lat'],$v['lng'])?$v['lat'].', '.$v['lng']:'待填写').'</td></tr>';}echo '</tbody></table>'; }echo '</div>';
 }
-add_action('admin_enqueue_scripts',function($hook){if(in_array($hook,array('post.php','post-new.php'),true))wp_enqueue_script('feng-travel-editor',get_theme_file_uri('/assets/js/travel-editor.js'),array(),feng_asset_version('/assets/js/travel-editor.js'),true);});
+add_action('admin_enqueue_scripts',function($hook){if(in_array($hook,array('post.php','post-new.php','posts_page_feng-travel'),true))wp_enqueue_script('feng-travel-editor',get_theme_file_uri('/assets/js/travel-editor.js'),array(),feng_asset_version('/assets/js/travel-editor.js'),true);});
 add_action('wp_ajax_feng_travel_search',function(){
  check_ajax_referer('feng_travel_search','nonce');$id=absint($_POST['post']??0);if(!$id||!current_user_can('edit_post',$id))wp_send_json_error(array('message'=>'没有编辑权限。'),403);
  $cfg=feng_map_config();

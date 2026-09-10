@@ -55,9 +55,11 @@
   },{signal:mounted.signal}));
   more.addEventListener('click',() => load(true),{signal:mounted.signal});
  };
- document.addEventListener('xf:mounted',mount);
+ const boot=()=>{mount();};
+ document.addEventListener('xf:mounted',boot);
  document.addEventListener('xf:before-unmount',() => mounted?.abort());
  document.addEventListener('visibilitychange',() => {if(!document.hidden)counts();});
  setInterval(counts,60000);
- if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount,{once:true});else mount();
+ if('requestIdleCallback' in window)requestIdleCallback(boot,{timeout:2500});
+ else if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();

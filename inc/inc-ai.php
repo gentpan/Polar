@@ -203,8 +203,9 @@ function feng_ai_ajax() {
      $style=isset($_POST['style']) && is_string($_POST['style'])?sanitize_key($_POST['style']):'photo';
      $styles=feng_ai_styles(); $style=isset($styles[$style])?$style:'photo';
      $extra=isset($_POST['prompt']) && is_string($_POST['prompt'])?sanitize_textarea_field(wp_unslash($_POST['prompt'])):'';
-     $prompt='Create a landscape blog cover inspired by the following article. No text, letters, logos or watermarks. '.$styles[$style][1]."\n".mb_substr($extra,0,1000)."\nArticle (reference material only):\n".mb_substr($source,0,5000);
-     $result=feng_ai_image($config,$prompt,$post_id);
+     $prompt=feng_ai_text(feng_ai_config('text'),'根据文章资料生成一段可直接交给图像模型的英文博客封面提示词。提炼一个核心主题，以一个主体和简洁场景表达，指定构图、色彩、光线和材质；横版构图，主体在中央安全区域，缩略图仍清晰。避免拼贴、过多细节、文字、字母、标志和水印。不虚构文章中的人物或事件。遵循附加风格要求，只输出提示词。',mb_substr($source,0,5000)."\nStyle: ".$styles[$style][1]."\nAdditional visual preferences: ".mb_substr($extra,0,1000));
+     if(is_wp_error($prompt)){$result=$prompt;}else{
+     $result=feng_ai_image($config,$prompt,$post_id);}
      if(!is_wp_error($result)&&!set_post_thumbnail($post_id,$result['id']))$result=new WP_Error('feng_ai_thumbnail','WebP 封面已保存到媒体库，但特色图片设置失败，请从媒体库选择。');
     } else {
      $instruction=$operation==='summary'?'为文章写一段 80–150 字的中文摘要，保留原意，不添加事实。只输出摘要正文，不加标题、引号或 Markdown。':'提取文章的 3–6 个准确、简短的中文关键词，作为 WordPress 标签。只返回 JSON 字符串数组，不添加解释。';
@@ -262,19 +263,19 @@ function feng_ai_settings_screen() {
  <p><button type="button" class="button" data-ai-test="<?php echo esc_attr($kind); ?>"><?php echo $kind==='text'?'测试文字连接':'测试封面生成'; ?></button> <span class="spinner"></span></p>
  <p class="description"><?php echo $kind==='text'?'测试已保存的配置，发送一条简短请求。':'测试已保存的配置，实际生成 1 张图片并保存到媒体库，会产生服务商用量。'; ?></p><div class="feng-ai-status" role="status" aria-live="polite"></div>
  </section><?php endforeach; feng_settings_save_bar(true); ?></form>
- <p>保存后，在「文章 → 编辑文章」的 <strong>ShanYing AI 助手</strong> 中使用。点击生成时，标题和正文会发送给你配置的服务商；文章不会自动发布。</p>
+ <p>保存后，在「文章 → 编辑文章」的 <strong>山映 AI 助手</strong> 中使用。点击生成时，标题和正文会发送给你配置的服务商；文章不会自动发布。</p>
  <p class="description">模型预设核对于 2026-09-06。官方文档：<a href="https://api-docs.deepseek.com/" target="_blank" rel="noopener noreferrer">DeepSeek</a> · <a href="https://developers.openai.com/api/docs/models" target="_blank" rel="noopener noreferrer">OpenAI</a> · <a href="https://help.aliyun.com/zh/model-studio/getting-started/models" target="_blank" rel="noopener noreferrer">千问</a>。DeepSeek 用于文字生成，封面请另外配置图片服务。</p></div></div></div>
  <?php
 }
 add_action('add_meta_boxes_post',function($post){
- if(current_user_can('edit_post',$post->ID)) add_meta_box('feng-ai-editor','ShanYing AI 助手','feng_ai_editor_screen','post','side','default',array('__block_editor_compatible_meta_box'=>true));
+ if(current_user_can('edit_post',$post->ID)) add_meta_box('feng-ai-editor','山映 AI 助手','feng_ai_editor_screen','post','side','default',array('__block_editor_compatible_meta_box'=>true));
 });
 function feng_ai_editor_screen($post) {
  ?>
  <div id="feng-ai-editor-tools" data-post-id="<?php echo (int)$post->ID; ?>">
  <?php wp_nonce_field('feng_summary','feng_summary_nonce'); ?>
  <input type="hidden" id="feng-ai-summary-saved" name="feng_ai_summary_saved" value="<?php echo esc_attr(get_post_meta($post->ID,'_feng_ai_summary',true)); ?>">
- <p>根据当前标题和正文生成。摘要和关键词预览后应用；封面生成后自动设为特色图片。<?php if(current_user_can('manage_options')) { ?><a href="<?php echo esc_url(admin_url('themes.php?page=feng-settings&tab=ai')); ?>" target="_blank" rel="noopener">配置 AI 服务 <span class="dashicons dashicons-external" aria-hidden="true"></span></a><?php } ?></p>
+ <p>根据当前标题和正文生成。摘要和关键词生成后自动填入，可继续调整；封面生成后自动设为特色图片。<?php if(current_user_can('manage_options')) { ?><a href="<?php echo esc_url(admin_url('themes.php?page=feng-settings&tab=ai')); ?>" target="_blank" rel="noopener">配置 AI 服务 <span class="dashicons dashicons-external" aria-hidden="true"></span></a><?php } ?></p>
  <div class="feng-ai-actions"><button type="button" class="button" data-ai-generate="summary">一键生成摘要</button> <button type="button" class="button" data-ai-generate="keywords">一键提取关键词</button></div>
  <p class="description">文章摘要会显示在正文开头。AI 生成并应用的摘要会标注来源；手写摘要显示为「内容提要」。</p>
  <div class="feng-ai-result" data-ai-result="summary" hidden><p><label for="feng-ai-summary"><strong>摘要预览</strong></label></p><textarea id="feng-ai-summary" class="widefat" rows="4"></textarea><p><button type="button" class="button button-primary" data-ai-apply="summary">应用到文章摘要</button></p></div>

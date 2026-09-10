@@ -26,7 +26,17 @@ document.addEventListener('xf:mounted',mount);
 document.addEventListener('xf:before-unmount',()=>{mounted.forEach(clean=>clean());mounted.clear();});
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount,{once:true});else mount();
 
-document.addEventListener('click',event=>{
+let hubRequest:AbortController|null=null;
+document.addEventListener('xf:before-unmount',()=>hubRequest?.abort());
+async function fillHub(panel:HTMLElement,type='latest',page='1'){
+ hubRequest?.abort();const controller=new AbortController();hubRequest=controller;
+ const url=new URL(panel.dataset.hubEndpoint!,location.href);url.searchParams.set('action','feng_hub');url.searchParams.set('category',panel.dataset.hubCategory||'0');url.searchParams.set('type',type);url.searchParams.set('page',page);
+ panel.setAttribute('aria-busy','true');const timer=setTimeout(()=>controller.abort(),12000);
+ try{const response=await fetch(url,{signal:controller.signal,credentials:'same-origin'});const data=await response.json();if(!response.ok||!data.success)throw new Error();if(controller.signal.aborted||!panel.isConnected)return;panel.innerHTML=data.data.html;delete panel.dataset.hubLazy;mount();return true;}
+ catch{if(!controller.signal.aborted)(window as any).fengToast?.('加载失败，请重试','error');return false;}
+ finally{clearTimeout(timer);if(hubRequest===controller){panel.removeAttribute('aria-busy');hubRequest=null;}}
+}
+document.addEventListener('click',async event=>{
  const button=(event.target as Element).closest<HTMLButtonElement>('[data-collection-tab]');
  if(!button)return;
  const hub=button.closest('.feng-article-hub');if(!hub)return;
@@ -36,18 +46,14 @@ document.addEventListener('click',event=>{
 
  hub.querySelectorAll<HTMLElement>('[data-collection-tab]').forEach(tab=>tab.setAttribute('aria-pressed',String(tab===button)));
  hub.querySelectorAll<HTMLElement>('[data-collection-panel]').forEach(panel=>{panel.hidden=panel.dataset.collectionPanel!==button.dataset.collectionTab;});
+ const panel=hub.querySelector<HTMLElement>(`[data-collection-panel="${button.dataset.collectionTab}"]`);
+ if(panel?.dataset.hubLazy==='1')await fillHub(panel);
 });
-let hubRequest:AbortController|null=null;
-document.addEventListener('xf:before-unmount',()=>hubRequest?.abort());
 document.addEventListener('click',async event=>{
  const button=(event.target as Element).closest<HTMLButtonElement>('[data-hub-type],[data-hub-page]');if(!button||button.disabled)return;
  const panel=button.closest<HTMLElement>('[data-hub-endpoint]');if(!panel)return;
- hubRequest?.abort();const controller=new AbortController();hubRequest=controller;
- const url=new URL(panel.dataset.hubEndpoint!,location.href);url.searchParams.set('action','feng_hub');url.searchParams.set('category',panel.dataset.hubCategory||'0');url.searchParams.set('type',button.dataset.hubType||button.dataset.hubSort||'latest');url.searchParams.set('page',button.dataset.hubPage||'1');
- panel.setAttribute('aria-busy','true');const timer=setTimeout(()=>controller.abort(),12000);
- try{const response=await fetch(url,{signal:controller.signal});const data=await response.json();if(!response.ok||!data.success)throw new Error();if(controller.signal.aborted||!panel.isConnected)return;panel.innerHTML=data.data.html;mount();panel.querySelector<HTMLElement>('[aria-pressed="true"]')?.focus({preventScroll:true});}
- catch{if(!controller.signal.aborted)(window as any).fengToast?.('加载失败，请重试','error');}
- finally{clearTimeout(timer);if(hubRequest===controller){panel.removeAttribute('aria-busy');hubRequest=null;}}
+ const ok=await fillHub(panel,button.dataset.hubType||button.dataset.hubSort||'latest',button.dataset.hubPage||'1');
+ if(ok)panel.querySelector<HTMLElement>('[aria-pressed="true"]')?.focus({preventScroll:true});
 });
 
 // Category strip: manual selection with category backgrounds.

@@ -46,11 +46,17 @@
 /* Keep subscription statistics beside the page title, wrapping below on small screens. */
 .feng-feed-hero { display:flex; align-items:center; justify-content:space-between; gap:24px; }
 .feng-feed-hero-copy > p:last-child { color:var(--xf-muted); font-size:13px; line-height:1.9; }
-.feng-feed-hero .feng-feed-overview { justify-content:flex-end; margin:0; gap:14px 24px; max-width:420px; }
-.feng-feed-hero .feng-feed-overview > span { white-space:nowrap; }
-.feng-feed-last-sync { flex-basis:100%; justify-content:flex-end; }
+.feng-feed-hero .feng-feed-overview { justify-content:flex-end; margin:0; gap:16px; max-width:100%; min-width:0; flex-wrap:nowrap; overflow-x:auto; }
+.feng-feed-hero .feng-feed-overview > span { white-space:nowrap; flex-shrink:0; }
+.feng-feed-last-sync { flex-basis:auto; justify-content:flex-end; }
 @media(max-width:700px) {
  .feng-feed-hero { align-items:flex-start; flex-direction:column; gap:20px; }
  .feng-feed-hero .feng-feed-overview { justify-content:flex-start; max-width:none; }
  .feng-feed-last-sync { justify-content:flex-start; }
 }
+
+/* Keep title geometry stable while subscription counts refresh. */
+.feng-feed-hero-copy{flex:0 0 auto;}
+.feng-feed-hero .feng-feed-overview{flex:0 1 auto;}
+.feng-feed-overview strong{font-variant-numeric:tabular-nums;min-width:2ch;text-align:right;}
+@media(max-width:700px){.feng-feed-hero .feng-feed-overview{flex-basis:100%;justify-content:flex-start;}}

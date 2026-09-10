@@ -18,21 +18,30 @@
   let themePreference = fixedScheme || (['light','dark','system'].includes(storedTheme) ? storedTheme : 'system');
   let manualTheme=false;
   try{manualTheme=localStorage.getItem('xf-theme-manual')==='1'&&['light','dark'].includes(storedTheme);}catch{}
+  if(manualTheme)themePreference=storedTheme;
   let visitorWeather=null;
-  try{const cached=JSON.parse(sessionStorage.getItem('polar-visitor-weather'));if(cached&&Date.now()-cached.at<3600000)visitorWeather=cached.weather;}catch{}
+  try{const cached=JSON.parse(localStorage.getItem('polar-visitor-weather')||sessionStorage.getItem('polar-visitor-weather'));if(cached&&Date.now()-cached.at<3600000)visitorWeather=cached.weather;}catch{}
   function isVisitorNight(){
-    if(typeof window.polarVisitorNight==='function')return window.polarVisitorNight(visitorWeather);
-    const hour=new Date().getHours();return hour<6||hour>=18;
+    // All pages resolve the visitor's solar clock; the Hero module is home-only.
+    const now=new Date(),seconds=now.getTime()/1000,w=visitorWeather;
+    const offset=Number.isFinite(w?.utc_offset)?w.utc_offset:null;
+    const hour=offset===null?now.getHours()+now.getMinutes()/60:((seconds+offset)%86400+86400)%86400/3600;
+    const rises=w?.sunrise||[],sets=w?.sunset||[],day=Math.floor((seconds+(offset||0))/86400);
+    for(let i=0;i<rises.length;i++){
+      if(rises[i]>0&&sets[i]>rises[i]&&Math.floor((rises[i]+(offset||0))/86400)===day)return seconds<rises[i]||seconds>=sets[i];
+    }
+    if(w&&rises.length&&typeof w.day==='boolean')return !w.day;
+    return hour<6||hour>=18;
   }
   document.addEventListener('polar:visitor-weather',event=>{
     visitorWeather=event.detail;
-    try{sessionStorage.setItem('polar-visitor-weather',JSON.stringify({at:Date.now(),weather:visitorWeather}));}catch{}
+    try{const cached=JSON.stringify({at:Date.now(),weather:visitorWeather});sessionStorage.setItem('polar-visitor-weather',cached);localStorage.setItem('polar-visitor-weather',cached);}catch{}
     themeButtons();
   });
   setInterval(()=>{if(!document.hidden)themeButtons();},60000);
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)themeButtons();});
   function themeButtons() {
-    if(fixedScheme)themePreference=fixedScheme;
+    if(fixedScheme&&!manualTheme)themePreference=fixedScheme;
     const night=isVisitorNight();
     root.dataset.xfNight=String(night);
     const autoNight=night&&!manualTheme;

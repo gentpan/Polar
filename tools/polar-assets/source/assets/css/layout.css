@@ -236,3 +236,7 @@ body.home,body.blog { --feng-motion-reveal: 1400ms; }
 
 /* The shared site shell defines the Header-to-content distance on every page. */
 .xf-main>:is(section,article,div,header):first-child{margin-top:0;}
+
+/* A tighter scrolled capsule, retaining the full header at the page top. */
+:root[data-xf-scrolled] .xf-header{min-height:48px;padding-block:4px;align-items:center;}
+:root[data-xf-scrolled] .xf-header .xf-menu>li>a{padding-block:6px;}

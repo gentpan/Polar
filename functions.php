@@ -2,6 +2,19 @@
 /** ShanYing: shared helpers live here; larger features remain in inc/. */
 if (!defined('ABSPATH')) exit;
 
+/** Resolve real client IP behind FrankenPHP reverse proxy. */
+function feng_real_ip(){
+ $ip=$_SERVER['REMOTE_ADDR']??'';
+ if(filter_var($ip,FILTER_VALIDATE_IP,FILTER_FLAG_NO_PRIV_RANGE|FILTER_FLAG_NO_RES_RANGE))return $ip;
+ foreach(array('HTTP_X_FORWARDED_FOR','HTTP_X_REAL_IP') as $h){
+  if(empty($_SERVER[$h]))continue;
+  $list=explode(',',$_SERVER[$h]);
+  $first=trim($list[0]);
+  if(filter_var($first,FILTER_VALIDATE_IP,FILTER_FLAG_NO_PRIV_RANGE|FILTER_FLAG_NO_RES_RANGE))return $first;
+ }
+ return $ip;
+}
+
 require_once get_template_directory() . '/inc/inc-settings.php';
 
 require_once get_template_directory() . '/inc/inc-ai.php';
@@ -47,7 +60,6 @@ function feng_asset_version( $path ) {
  return is_file( $file ) ? (string) filemtime( $file ) : wp_get_theme()->get( 'Version' );
 }
 function feng_enqueue_assets() {
- wp_enqueue_style('feng-space-grotesk','https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap',array(),null);
  wp_enqueue_style('feng-code-font',get_theme_file_uri('/assets/css/code-font.css'),array('feng-article'),feng_asset_version('/assets/css/code-font.css'));
  wp_enqueue_style( 'feng-brand-font', 'https://static.bluecdn.com/fonts/alimama-fangyuanti.css', array(), null );
  if ( is_home() || is_front_page() ) {
@@ -73,8 +85,7 @@ function feng_enqueue_assets() {
  wp_enqueue_script('feng-dashboard',get_theme_file_uri('/assets/js/dashboard.js'),array('xf-app'),feng_asset_version('/assets/js/dashboard.js'),array('strategy'=>'defer','in_footer'=>true));
  wp_enqueue_script('feng-toast',get_theme_file_uri('/assets/js/toast.js'),array(),feng_asset_version('/assets/js/toast.js'),true);
  wp_enqueue_script( 'xf-app', get_theme_file_uri( '/assets/js/app.js' ), array(), feng_asset_version( '/assets/js/app.js' ), array( 'strategy' => 'defer', 'in_footer' => true ) );
- // Keep core reply runtime available when navigating into a comment thread.
- if ( get_option( 'thread_comments' ) ) { wp_enqueue_script( 'comment-reply' ); }
+ if ( get_option( 'thread_comments' ) && is_singular() && comments_open() ) { wp_enqueue_script( 'comment-reply' ); }
 }
 add_action( 'wp_enqueue_scripts', 'feng_enqueue_assets' );
 function feng_runtime_marker() {
@@ -108,7 +119,7 @@ add_action('wp_enqueue_scripts',function(){
    $scripts->registered[$handle]->src=false;
   }
  }
- wp_enqueue_style('shanying-theme',get_theme_file_uri('/assets/css/main.css'),array('feng-fontawesome-pro'),feng_asset_version('/assets/css/main.css'));
+ wp_enqueue_style('shanying-theme',get_theme_file_uri('/assets/css/main.css'),array(),feng_asset_version('/assets/css/main.css'));
  $dependencies=array_values(array_filter($scripts->queue,fn($handle)=>$handle!=='shanying-theme'));
  wp_enqueue_script('shanying-theme',get_theme_file_uri('/assets/js/main.js'),$dependencies,feng_asset_version('/assets/js/main.js'),true);
  $GLOBALS['shanying_script_modules']['shanying-theme']=$enabled;
@@ -202,6 +213,11 @@ function feng_category_fontawesome(){
  wp_enqueue_style('feng-fontawesome-pro','https://static.bluecdn.com/libs/fontawesome-pro-plus/7.3.1/css/all.min.css',array(),'7.3.1');
 }
 add_action('wp_enqueue_scripts','feng_category_fontawesome');
+add_filter('style_loader_tag',static function($html,$handle){
+ if($handle!=='feng-fontawesome-pro')return $html;
+ $html=preg_replace('/\smedia=([\'"])all\1/',' media="print" onload="this.media=\'all\'"',$html,1);
+ return $html.'<noscript>'.preg_replace('/\smedia="print" onload="this\.media=\'all\'"/',' media="all"',$html).'</noscript>';
+},10,2);
 function feng_category_badge($id){
  $term=get_term($id,'category');
  if($term&&!is_wp_error($term)){
@@ -445,19 +461,6 @@ function feng_collection_ajax() {
 add_action('wp_ajax_feng_collection','feng_collection_ajax');
 add_action('wp_ajax_nopriv_feng_collection','feng_collection_ajax');
 
-/** The archive shortcut lives in the header tools, not twice in primary navigation. */
-add_filter('wp_nav_menu_objects',function($items,$args){
- if(($args->theme_location??'')!=='primary') return $items;
- $archive=feng_page_url('archives');if(!$archive)return $items;
- $removed=array();
- foreach($items as $item) {
-  $same_url=untrailingslashit($item->url)===untrailingslashit($archive);
-  $archive_page=$item->object==='page' && get_page_template_slug((int)$item->object_id)==='pages/archives.php';
-  if($same_url||$archive_page)$removed[$item->ID]=$item->menu_item_parent;
- }
- foreach($items as $item)if(isset($removed[$item->menu_item_parent]))$item->menu_item_parent=$removed[$item->menu_item_parent];
- return array_values(array_filter($items,static function($item)use($removed){return !isset($removed[$item->ID]);}));
-},20,2);
 function feng_random_article_id($exclude=0) {
  global $wpdb;
  $where="post_type='post' AND post_status='publish' AND post_password=''";
@@ -605,9 +608,10 @@ function feng_weekly_blog_stats($after=null){
 }
 
 /** Cache public events, then apply the rolling window at render time. */
-function feng_weekly_github_stats(){
+function feng_weekly_github_stats($fetch=true){
  $cache=get_transient('polar_github_gentpan_events_v1');
  if(false===$cache){
+  if(!$fetch)return null;
   $cache=array('events'=>array(),'complete'=>false,'error'=>false);
   for($page=1;$page<=3;$page++){
    $response=wp_remote_get('https://api.github.com/users/gentpan/events/public?per_page=100&page='.$page,array('timeout'=>8,'headers'=>array('Accept'=>'application/vnd.github+json','User-Agent'=>'ShanYing-xifeng.net')));
@@ -630,6 +634,127 @@ function feng_weekly_github_stats(){
  }
  return array('daily'=>$daily,'pushes'=>$pushes,'projects'=>count($repos),'complete'=>$cache['complete']);
 }
+
+function feng_github_activity_markup($stats){
+ if(!$stats)return '<small>GitHub 暂未同步</small>';
+ $daily=array_slice($stats['daily'],-7,null,true);$peak=max(1,max($daily));$today_pushes=(int)end($daily);
+ ob_start(); ?>
+ <span class="feng-mini-caption"><?php echo $today_pushes?'今日 '.$today_pushes.' 次推送':'今日暂无推送'; ?><em> · 近 7 天 <?php echo $stats['complete']?'':'至少 '; ?><?php echo (int)array_sum($daily); ?> 次</em></span><div class="feng-mini-bars" aria-label="GitHub 最近七个日期的公开推送，今天尚未结束<?php echo $stats['complete']?'':'，数据不完整'; ?>"><?php foreach($daily as $date=>$count): ?><span data-count="<?php echo (int)$count; ?>" aria-label="<?php echo esc_attr($date.' · '.$count.' 次推送'); ?>"><i style="--bar-height:<?php echo $count?max(8,round($count/$peak*100)):0; ?>%"></i></span><?php endforeach; ?></div>
+ <?php return trim(ob_get_clean());
+}
+function feng_github_stats_ajax(){
+ nocache_headers();
+ $stats=feng_weekly_github_stats(true);
+ if(!$stats)wp_send_json_error(null,503);
+ wp_send_json_success(array('html'=>feng_github_activity_markup($stats)));
+}
+add_action('wp_ajax_feng_github_stats','feng_github_stats_ajax');
+add_action('wp_ajax_nopriv_feng_github_stats','feng_github_stats_ajax');
+
+function feng_heatmap_counts($start,$end){
+ global $wpdb;
+ $rows=$wpdb->get_results($wpdb->prepare("SELECT DATE(post_date) AS day, COUNT(*) AS total FROM {$wpdb->posts} WHERE post_type IN ('post','feng_talk') AND post_status='publish' AND post_password='' AND post_date >= %s AND post_date <= %s GROUP BY DATE(post_date)",$start->format('Y-m-d').' 00:00:00',$end->format('Y-m-d').' 23:59:59'),OBJECT_K);
+ $counts=array();
+ if($rows)foreach($rows as $day=>$row)$counts[$day]=(int)$row->total;
+ return $counts;
+}
+function feng_heatmap_day_markup($date){
+ if(!preg_match('/^\d{4}-\d{2}-\d{2}$/',$date))return '';
+ $start=DateTimeImmutable::createFromFormat('!Y-m-d',$date,wp_timezone());
+ if(!$start||$start->format('Y-m-d')!==$date)return '';
+ $today=new DateTimeImmutable('today',wp_timezone());
+ if($start>$today||$start<$today->modify('-89 days'))return '';
+ $cache_key='feng_heatmap_day_v1_'.$date;
+ $cached=get_transient($cache_key);
+ if($cached!==false)return is_string($cached)?$cached:'';
+ $items=get_posts(array('post_type'=>array('post','feng_talk'),'post_status'=>'publish','has_password'=>false,'posts_per_page'=>30,'no_found_rows'=>true,'orderby'=>array('date'=>'DESC','ID'=>'DESC'),'date_query'=>array(array('after'=>$date.' 00:00:00','before'=>$date.' 23:59:59','inclusive'=>true,'column'=>'post_date'))));
+ if(!$items){$html='';set_transient($cache_key,$html,6*HOUR_IN_SECONDS);return $html;}
+ ob_start();echo '<ul>';
+ foreach($items as $item)echo '<li><a href="'.esc_url($item->post_type==='feng_talk'?feng_page_url('talks').'#talk-'.$item->ID:get_permalink($item)).'"><small>'.($item->post_type==='feng_talk'?'说说 · ':'文章 · ').'</small>'.esc_html($item->post_type==='feng_talk'?wp_trim_words(wp_strip_all_tags($item->post_content),25,'…'):get_the_title($item)).'</a></li>';
+ echo '</ul>';$html=ob_get_clean();
+ set_transient($cache_key,$html,6*HOUR_IN_SECONDS);
+ return $html;
+}
+function feng_heatmap_day_ajax(){
+ $date=isset($_GET['date'])&&is_string($_GET['date'])?sanitize_text_field(wp_unslash($_GET['date'])):'';
+ $html=feng_heatmap_day_markup($date);
+ wp_send_json_success(array('html'=>$html));
+}
+add_action('wp_ajax_feng_heatmap_day','feng_heatmap_day_ajax');
+add_action('wp_ajax_nopriv_feng_heatmap_day','feng_heatmap_day_ajax');
+
+function feng_hero_visitors(){
+ global $wpdb;
+ $rows=$wpdb->get_results("SELECT c.comment_ID,c.comment_author,c.comment_author_email,c.comment_author_url,c.user_id FROM {$wpdb->comments} c INNER JOIN {$wpdb->posts} p ON p.ID=c.comment_post_ID WHERE c.comment_approved='1' AND c.comment_type IN ('comment','') AND p.post_status='publish' AND p.post_password='' ORDER BY c.comment_date_gmt DESC,c.comment_ID DESC LIMIT 120");
+ $recent_visitors=array();$visitor_counts=array();$visitor_users=array();
+ foreach($rows as $comment){
+  $email=strtolower(trim($comment->comment_author_email));
+  if(!$email && !$comment->user_id)continue;
+  $lookup=$comment->user_id?'user:'.$comment->user_id:'email:'.$email;
+  if(!array_key_exists($lookup,$visitor_users))$visitor_users[$lookup]=$comment->user_id?get_userdata((int)$comment->user_id):($email?get_user_by('email',$email):false);
+  $user=$visitor_users[$lookup];
+  if($user && user_can($user,'manage_options'))continue;
+  $key=$user?'user:'.$user->ID:'email:'.$email;
+  if(!isset($recent_visitors[$key]))$recent_visitors[$key]=$comment;
+  $visitor_counts[$key]=($visitor_counts[$key]??0)+1;
+ }
+ arsort($visitor_counts,SORT_NUMERIC);
+ $visitors=array();
+ foreach(array_slice($visitor_counts,0,5,true) as $key=>$count)$visitors[$key]=$recent_visitors[$key];
+ foreach($recent_visitors as $key=>$comment){
+  if(count($visitors)>=10)break;
+  if(!isset($visitors[$key]))$visitors[$key]=$comment;
+ }
+ return $visitors;
+}
+function feng_hero_visitors_markup(){
+ ob_start();
+ foreach(feng_hero_visitors() as $visitor){
+  $visitor_url=esc_url($visitor->comment_author_url,array('http','https'));
+  if($visitor_url)echo '<a class="feng-visitor-avatar" href="'.$visitor_url.'" target="_blank" rel="ugc nofollow noopener noreferrer" title="'.esc_attr($visitor->comment_author.'的网站').'">';
+  else echo '<span class="feng-visitor-avatar" title="'.esc_attr($visitor->comment_author).'">';
+  echo get_avatar($visitor,44,'',$visitor->comment_author,array('loading'=>'lazy','decoding'=>'async'));
+  echo $visitor_url?'</a>':'</span>';
+ }
+ return ob_get_clean();
+}
+function feng_weekly_badges_markup(){
+ global $wpdb;
+ $totals=array(
+  'posts'=>(int)$wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_type='post' AND post_status='publish' AND post_password=''"),
+  'talks'=>(int)$wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_type='feng_talk' AND post_status='publish'"),
+  'comments'=>(int)$wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->comments} WHERE comment_approved='1'"),
+ );
+ ob_start();
+ foreach($totals as $key=>$count){$label=array('posts'=>'文章','talks'=>'说说','comments'=>'评论')[$key];echo '<span title="'.esc_attr('全部 · '.$label).'">'.esc_html($label).' <b>'.esc_html((string)$count).'</b></span>';}
+ return trim(ob_get_clean());
+}
+function feng_hero_activity_payload(){
+ $key='feng_hero_activity_v1';
+ $today=wp_date('Y-m-d');
+ $cached=get_transient($key);
+ if(is_array($cached)&&($cached['day']??'')===$today)return $cached;
+ $now=new DateTimeImmutable('today',wp_timezone());
+ $payload=array('day'=>$today,'counts'=>feng_heatmap_counts($now->modify('-89 days'),$now),'badges'=>feng_weekly_badges_markup(),'visitors'=>feng_hero_visitors_markup());
+ set_transient($key,$payload,HOUR_IN_SECONDS);
+ return $payload;
+}
+function feng_hero_activity_ajax(){
+ wp_send_json_success(feng_hero_activity_payload());
+}
+add_action('wp_ajax_feng_hero_activity','feng_hero_activity_ajax');
+add_action('wp_ajax_nopriv_feng_hero_activity','feng_hero_activity_ajax');
+function feng_flush_hero_activity($post_id=0){
+ delete_transient('feng_hero_activity_v1');
+ $post=$post_id?get_post($post_id):null;
+ if($post&&in_array($post->post_type,array('post','feng_talk'),true))delete_transient('feng_heatmap_day_v1_'.substr($post->post_date,0,10));
+}
+add_action('save_post',static function($id){if(wp_is_post_revision($id)||wp_is_post_autosave($id))return;feng_flush_hero_activity($id);},20);
+add_action('before_delete_post','feng_flush_hero_activity');
+add_action('trashed_post','feng_flush_hero_activity');
+add_action('comment_post',static function(){delete_transient('feng_hero_activity_v1');});
+add_action('deleted_comment',static function(){delete_transient('feng_hero_activity_v1');});
+add_action('transition_comment_status',static function(){delete_transient('feng_hero_activity_v1');});
 
 
 require_once get_template_directory() . '/inc/inc-talk.php';
@@ -928,7 +1053,7 @@ add_action('admin_notices',function(){if(current_user_can('manage_options')&&($_
 <?php
 /** site-extras */
 if(!defined('ABSPATH'))exit;
-add_action('wp_head',function(){if(feng_setting('analytics_mode','off')==='custom')echo "\n".feng_setting('analytics_code','')."\n";},90);
+add_action('wp_footer',function(){if(feng_setting('analytics_mode','off')==='custom')echo "\n".feng_setting('analytics_code','')."\n";},20);
 function feng_blog_decade_data($now=null){
  $value=feng_setting('decade_start','');
  if(!$value){$first=get_posts(array('post_type'=>'post','post_status'=>'publish','has_password'=>false,'posts_per_page'=>1,'orderby'=>array('date'=>'ASC','ID'=>'ASC'),'ignore_sticky_posts'=>true));if(!$first)return null;$value=substr($first[0]->post_date,0,10);}
@@ -1029,7 +1154,7 @@ function feng_visitor_stats_ping(){
  $total=(int)$wpdb->get_var("SELECT option_value FROM {$wpdb->options} WHERE option_name='feng_total_pageviews'");
  $location=get_transient('polar_latest_visitor_location');
  if($event!==''&&$old!==$event){
-  $ip=$_SERVER['REMOTE_ADDR']??'';
+  $ip=feng_real_ip();
   $geo=feng_comment_geo_lookup($ip);
   if(!$geo&&($preview=feng_local_preview_geo()))$geo=array('label'=>sanitize_text_field($preview['city']??$preview['region']??''),'code'=>strtolower(sanitize_text_field($preview['country_code']??'')));
   if($geo){$location=$geo;set_transient('polar_latest_visitor_location',$geo,DAY_IN_SECONDS);}
@@ -1095,7 +1220,7 @@ function feng_weather_current($city){
 function feng_local_preview_geo(){
  $host=strtolower((string)wp_parse_url(home_url(),PHP_URL_HOST));
  $local=wp_get_environment_type()==='local'||$host==='localhost'||str_ends_with($host,'.local')||in_array($host,array('127.0.0.1','[::1]'),true);
- $ip=$_SERVER['REMOTE_ADDR']??'';
+ $ip=feng_real_ip();
  if(!$local||filter_var($ip,FILTER_VALIDATE_IP,FILTER_FLAG_NO_PRIV_RANGE|FILTER_FLAG_NO_RES_RANGE))return null;
  $geo=feng_weather_json('https://ipwho.is/?fields=success,city,region,country_code,latitude,longitude',HOUR_IN_SECONDS);
  return !empty($geo['success'])?$geo:null;
@@ -1106,7 +1231,7 @@ function feng_weather_ajax(){
  if($kind==='visitor'){
   if(!feng_setting('weather_visitor',true))wp_send_json_success(null);
   // Trust the server address, not arbitrary client-supplied forwarding headers.
-  $ip=$_SERVER['REMOTE_ADDR']??'';
+  $ip=feng_real_ip();
   if(filter_var($ip,FILTER_VALIDATE_IP,FILTER_FLAG_NO_PRIV_RANGE|FILTER_FLAG_NO_RES_RANGE)){
    $geo=feng_weather_json('https://ipwho.is/'.rawurlencode($ip).'?fields=success,city,latitude,longitude',HOUR_IN_SECONDS);
    if(!empty($geo['success']))$city=array('name'=>$geo['city']??'','latitude'=>$geo['latitude']??null,'longitude'=>$geo['longitude']??null);
@@ -1133,3 +1258,37 @@ function feng_search_form_markup($form, $args = array()) {
     return ob_get_clean();
 }
 add_filter('get_search_form', 'feng_search_form_markup', 10, 2);
+
+// === Custom Permalink: /post/{display_id}.html ===
+add_action('init', 'feng_custom_permalink_init');
+function feng_custom_permalink_init() {
+    add_rewrite_tag('%display_id%', '([0-9]+)', 'display_id=');
+}
+add_filter('query_vars', function($vars) {
+    $vars[] = 'display_id';
+    return $vars;
+});
+add_filter('post_link', 'feng_display_id_permalink', 10, 3);
+function feng_display_id_permalink($permalink, $post, $leavename) {
+    if ($post->post_type !== 'post') return $permalink;
+    $display_id = get_post_meta($post->ID, '_feng_display_id', true);
+    if (!$display_id) $display_id = $post->ID;
+    return str_replace('%display_id%', $display_id, $permalink);
+}
+add_action('parse_request', 'feng_display_id_parse_request');
+function feng_display_id_parse_request($wp) {
+    if (empty($wp->query_vars['display_id'])) return;
+    $display_id = absint($wp->query_vars['display_id']);
+    $post_id = feng_get_post_id_by_display_id($display_id);
+    if ($post_id) {
+        $wp->query_vars['p'] = $post_id;
+        unset($wp->query_vars['display_id']);
+    }
+}
+function feng_get_post_id_by_display_id($display_id) {
+    global $wpdb;
+    return (int) $wpdb->get_var($wpdb->prepare(
+        "SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key='_feng_display_id' AND meta_value=%s LIMIT 1",
+        (string) $display_id
+    ));
+}

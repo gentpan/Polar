@@ -54,7 +54,7 @@
 #side-sortables #feng-ai-editor-tools,#side-sortables [data-travel-editor]{font-size:12px;line-height:1.65;}
 #side-sortables #feng-ai-editor-tools>p:first-of-type,#side-sortables [data-travel-editor]>p:first-child{color:#646970;}
 #side-sortables .feng-ai-actions{display:grid;grid-template-columns:1fr;gap:6px;}
-#side-sortables #feng-ai-editor-tools select,#side-sortables [data-travel-editor] input:not([type=hidden]),#side-sortables [data-travel-editor] select{width:100%;max-width:100%;box-sizing:border-box;}
+#side-sortables #feng-ai-editor-tools select,#side-sortables [data-travel-editor] input:not([type=hidden]):not([type=checkbox]):not([type=radio]),#side-sortables [data-travel-editor] select{width:100%;max-width:100%;box-sizing:border-box;}
 #side-sortables #feng-ai-editor-tools .button,#side-sortables [data-place-search]{width:100%;margin-top:6px;white-space:normal;}
 #side-sortables .feng-ai-result{padding:10px;border-radius:6px;background:#f6f7f7;}
 #side-sortables .feng-ai-result img{border-radius:4px;}
@@ -118,7 +118,7 @@ body.taxonomy-link_category .column-feng_friend_icon svg{width:20px;height:20px;
   --xf-soft: #f1f2f5; --xf-width: 1200px; --xf-reading: 760px;
   --xf-radius: 28px; --xf-radius-small: 16px;
   --feng-radius-panel: 36px; --feng-radius-card: 28px; --feng-radius-row: 24px; --feng-radius-thumb: 12px;
-  --xf-font: "Space Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --xf-font: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
   --xf-shadow: 0 18px 55px rgb(20 24 40 / .065);
   --xf-ease: cubic-bezier(.2,.75,.25,1); --xf-duration: 700ms; --feng-motion-enter: 850ms; --feng-motion-reveal: 1000ms; --feng-motion-gentle: cubic-bezier(.4,0,.25,1);
   color-scheme: light;
@@ -227,7 +227,7 @@ body:has(.feng-comment-form :is(input,textarea):focus) .feng-reading-tools { vis
 }
 
 /* A separate recommendation panel with thumbnail cards. */
-.single-post .feng-reading-related{margin:32px 0;border:1px solid var(--xf-line);border-radius:24px;padding:28px;background:var(--xf-surface);box-shadow:0 8px 28px rgb(20 24 35 / .035);}
+.single-post .feng-reading-related{margin:32px 0;border:1px solid var(--xf-line);border-radius:0;padding:28px;background:var(--xf-surface);box-shadow:0 8px 28px rgb(20 24 35 / .035);}
 .feng-related-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;}.feng-related-heading h2{margin:5px 0 18px;}.feng-related-refresh{display:flex;align-items:center;gap:6px;background:var(--xf-soft);border:1px solid var(--xf-line);border-radius:22px;padding:8px 12px;color:var(--xf-text);cursor:pointer;font:inherit;font-size:12px;}.feng-related-refresh:disabled{opacity:.4;cursor:default;}
 
 .feng-reading-related>.feng-related-panel{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;transition:opacity .2s,transform .2s;}.feng-reading-related [hidden]{display:none!important;}.feng-related-panel.is-refreshing{opacity:.25;transform:translateY(5px);}
@@ -237,7 +237,7 @@ body:has(.feng-comment-form :is(input,textarea):focus) .feng-reading-tools { vis
 @media(prefers-reduced-motion:reduce){.feng-related-panel,.feng-related-image img{transition:none!important;}.feng-related-refresh.is-refreshing :is(svg,.feng-icon){animation:none;}}
 
 .feng-article-age{box-sizing:border-box;margin:24px auto;padding:16px 20px;border:1px solid color-mix(in srgb,#ba882e 28%,var(--xf-line));border-radius:14px;background:color-mix(in srgb,#e7ba59 10%,var(--xf-surface));font-size:13px;line-height:1.8;width:calc(100% - 56px);}.feng-article-age p{margin:5px 0 0;color:var(--xf-muted);}
-.feng-article-copyright{padding:22px;border:1px solid var(--xf-line);border-radius:18px;background:var(--xf-soft);margin-bottom:20px;color:var(--xf-text);}.feng-article-copyright h2{font-size:15px;margin:0 0 18px;}.feng-article-copyright dl{display:grid;grid-template-columns:1fr 1fr;gap:12px 20px;}.feng-article-copyright dl>div{display:grid;grid-template-columns:64px minmax(0,1fr);gap:10px;}.feng-article-copyright dt{color:var(--xf-muted);font-size:12px;}.feng-article-copyright dd{margin:0;overflow-wrap:anywhere;}.feng-article-copyright a{color:inherit;text-decoration:none;}.feng-article-copyright a:hover{text-decoration:underline;}.feng-copyright-rule{border-top:1px solid var(--xf-line);padding-top:14px;margin:18px 0 0;font-size:12px;line-height:1.9;}.feng-copyright-scope{font-size:11px;color:var(--xf-muted);margin:8px 0 0;line-height:1.8;}
+.feng-article-copyright{padding:22px;border:1px solid var(--xf-line);border-radius:0;background:var(--xf-soft);margin-bottom:20px;color:var(--xf-text);}.feng-article-copyright h2{font-size:15px;margin:0 0 18px;}.feng-article-copyright dl{display:grid;grid-template-columns:1fr 1fr;gap:12px 20px;}.feng-article-copyright dl>div{display:grid;grid-template-columns:64px minmax(0,1fr);gap:10px;}.feng-article-copyright dt{color:var(--xf-muted);font-size:12px;}.feng-article-copyright dd{margin:0;overflow-wrap:anywhere;}.feng-article-copyright a{color:inherit;text-decoration:none;}.feng-article-copyright a:hover{text-decoration:underline;}.feng-copyright-rule{border-top:1px solid var(--xf-line);padding-top:14px;margin:18px 0 0;font-size:12px;line-height:1.9;}.feng-copyright-scope{font-size:11px;color:var(--xf-muted);margin:8px 0 0;line-height:1.8;}
 @media(max-width:600px){.feng-article-copyright{padding:16px;}.feng-article-copyright dl{grid-template-columns:1fr;}.feng-article-age{width:calc(100% - 36px);}}
 
 .feng-related-heading{margin-bottom:20px;}.feng-related-heading h2{margin-bottom:0;}.feng-related-refresh{width:36px;height:36px;padding:0;justify-content:center;flex-shrink:0;}.feng-related-refresh svg{width:18px;height:18px;}
@@ -247,7 +247,7 @@ body:has(.feng-comment-form :is(input,textarea):focus) .feng-reading-tools { vis
 @media(max-width:700px){.feng-reading-tools{right:12px;gap:2px;padding-inline:8px;}.feng-reading-tools [data-reading-focus],.feng-reading-tools [data-reading-print]{display:none;}.feng-reading-toc nav{left:auto;right:0;transform:none;}}
 
 /* Keep reading: captions stay within the cover; metadata slides up on interaction. */
-.feng-reading-related a.feng-related-item{display:block;position:relative;overflow:hidden;border-radius:14px;color:#fff;isolation:isolate;}
+.feng-reading-related a.feng-related-item{display:block;position:relative;overflow:hidden;border-radius:0;color:#fff;isolation:isolate;}
 .feng-related-item::after{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(transparent 30%,rgb(0 0 0 / .78));pointer-events:none;}
 .feng-related-image{border-radius:0;}
 .feng-related-caption{position:absolute;z-index:2;inset:auto 16px 16px;transform:translateY(30px);transition:transform .35s var(--xf-ease);}
@@ -267,7 +267,7 @@ body:has(.feng-comment-form :is(input,textarea):focus) .feng-reading-tools { vis
 .feng-copyright-watermark{position:absolute;right:18px;top:12px;z-index:-1;pointer-events:none;user-select:none;color:var(--xf-text);opacity:.07;font-size:100px;line-height:1;}
 @media(max-width:600px){.feng-copyright-watermark{font-size:78px;right:12px;}}
 /* Compact attribution with a quiet surface and a single source row. */
-.feng-article-copyright{padding:18px 22px;background:#fafafa;border-color:color-mix(in srgb,var(--xf-text) 10%,transparent);border-radius:14px;}
+.feng-article-copyright{padding:18px 22px;background:#fafafa;border-color:color-mix(in srgb,var(--xf-text) 10%,transparent);border-radius:0;}
 :root[data-xf-theme="dark"] .feng-article-copyright{background:#191919;}
 .feng-article-copyright h2{font-size:14px;margin:0 0 12px;}
 .feng-article-copyright dl{grid-template-columns:repeat(4,minmax(0,1fr));gap:10px 16px;margin:0;}
@@ -302,3 +302,10 @@ body:has(.feng-comment-form :is(input,textarea):focus) .feng-reading-tools { vis
 .feng-entry-round[data-reading-toggle][hidden]{display:none;}
 .feng-entry-round[data-reading-toggle][aria-expanded="true"]{color:var(--xf-accent);}
 @media(max-width:700px){.feng-reading-tools{top:100px;}.feng-reading-toc nav{max-height:calc(100dvh - 200px);}}
+
+.single-post .feng-reading-related{border-radius:0;}
+
+/* Font Awesome refresh stays centered; no competing animated icon replacement. */
+.feng-related-refresh .fa-arrows-rotate{display:inline-block;font-size:18px;width:1em;height:1em;line-height:1;color:currentColor;}
+.feng-related-refresh.is-refreshing .fa-arrows-rotate{animation:feng-related-spin .8s linear infinite;}
+@media(prefers-reduced-motion:reduce){.feng-related-refresh.is-refreshing .fa-arrows-rotate{animation:none;}}

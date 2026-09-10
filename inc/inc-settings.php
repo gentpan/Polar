@@ -79,6 +79,7 @@ function feng_settings_schema() {
    'profile_tagline'=>array('个人介绍','textarea','保持好奇，记录生活。'),
    'profile_location'=>array('所在地（可留空）','text',''),
    'social_github'=>array('GitHub','url',''),
+   'social_x'=>array('X / Twitter','url',''),
    'social_bilibili'=>array('哔哩哔哩','url',''),
    'social_weibo'=>array('微博','url',''),
    'social_mastodon'=>array('Mastodon','url',''),
@@ -179,7 +180,7 @@ function feng_settings_screen() {
  elseif($field[1]==='select') { ?><select id="<?php echo esc_attr($input_id); ?>" name="<?php echo esc_attr($name); ?>"><?php foreach($field[3] as $option=>$label) { ?><option value="<?php echo esc_attr($option); ?>" <?php selected($value,$option); ?>><?php echo esc_html($label); ?></option><?php } ?></select><?php }
  elseif(in_array($field[1],array('textarea','code'),true)) { ?><textarea class="large-text" rows="3" id="<?php echo esc_attr($input_id); ?>" name="<?php echo esc_attr($name); ?>"><?php echo esc_textarea($value); ?></textarea><?php }
  else { $media=in_array($field[1],array('image','video'),true); $type=$media?($field[1]==='video'?'number':'url'):$field[1]; ?><input class="regular-text" type="<?php echo esc_attr($type); ?>" id="<?php echo esc_attr($input_id); ?>" name="<?php echo esc_attr($name); ?>" value="<?php echo esc_attr($value); ?>" <?php if($field[1]==='number') echo 'min="1" max="60"'; ?>><?php if($media) { ?> <button type="button" class="button feng-media-icon" data-feng-media="<?php echo esc_attr($field[1]); ?>" data-feng-target="<?php echo esc_attr($input_id); ?>" aria-label="选择媒体" title="选择媒体"><span class="dashicons dashicons-format-image" aria-hidden="true"></span></button> <button type="button" class="button feng-media-icon feng-media-icon--clear" data-feng-clear="<?php echo esc_attr($input_id); ?>" aria-label="清除已选媒体" title="清除已选媒体（不删除媒体库文件）"><span class="dashicons dashicons-trash" aria-hidden="true"></span></button><?php } } ?>
- </div><?php if($key==='analytics_code'): ?><p class="description">粘贴统计平台提供的完整代码，仅具有 unfiltered_html 权限的管理员可修改。启用后输出到前台 head，支持带 defer 的脚本。</p><?php elseif($key==='images_webp'): ?><p class="description">新上传的 JPEG 和静态 PNG 转为 WebP（质量 82）；保留透明度，GIF、动画 PNG、SVG 和已有 WebP 保持原格式。失败时保留原图。</p><?php elseif($key==='disable_revisions'): ?><p class="description">只影响后续保存，不删除已有修订。自动保存保留。</p><?php elseif($key==='remove_category_base'): ?><p class="description">保存后自动更新分类路由。与已有页面地址冲突的分类保留原链接。</p><?php elseif($key==='jieqi_enabled'): ?><p class="description">使用节期的邮票风格卡片，按北京时间判断显示时机。访客可以关闭弹出的卡片，站点总开关在此设置。</p><?php elseif($key==='xf_eyebrow'): ?><p class="description">Hero 标题使用<a href="<?php echo esc_url(admin_url('options-general.php')); ?>">站点副标题</a>，这里设置标题上方的欢迎语。</p><?php elseif($key==='pet_side'): ?><p class="description">首页显示在最新说说右侧，其余页面使用此位置。</p><?php elseif($key==='profile_avatar'): ?><p class="description">用于关于页面；页头头像读取站点管理邮箱对应的 Gravatar。</p><?php endif; ?></td></tr><?php endforeach; ?></table>
+ </div><?php if($key==='analytics_code'): ?><p class="description">粘贴统计平台提供的完整代码，仅具有 unfiltered_html 权限的管理员可修改。启用后输出到页脚，支持带 defer 的脚本。</p><?php elseif($key==='images_webp'): ?><p class="description">新上传的 JPEG 和静态 PNG 转为 WebP（质量 82）；保留透明度，GIF、动画 PNG、SVG 和已有 WebP 保持原格式。失败时保留原图。</p><?php elseif($key==='disable_revisions'): ?><p class="description">只影响后续保存，不删除已有修订。自动保存保留。</p><?php elseif($key==='remove_category_base'): ?><p class="description">保存后自动更新分类路由。与已有页面地址冲突的分类保留原链接。</p><?php elseif($key==='jieqi_enabled'): ?><p class="description">使用节期的邮票风格卡片，按北京时间判断显示时机。访客可以关闭弹出的卡片，站点总开关在此设置。</p><?php elseif($key==='xf_eyebrow'): ?><p class="description">Hero 标题使用<a href="<?php echo esc_url(admin_url('options-general.php')); ?>">站点副标题</a>，这里设置标题上方的欢迎语。</p><?php elseif($key==='pet_side'): ?><p class="description">首页显示在最新说说右侧，其余页面使用此位置。</p><?php elseif($key==='profile_avatar'): ?><p class="description">用于关于页面；页头头像读取站点管理邮箱对应的 Gravatar。</p><?php endif; ?></td></tr><?php endforeach; ?></table>
  <?php if($id==='appearance'): ?><div class="feng-native-links"><h3>站点基础设置</h3><p>直接使用 WordPress 管理站点名称、副标题和导航。</p></div><?php endif; ?>
  </section><?php endforeach; feng_settings_save_bar(); ?></form>
  <?php feng_database_cleanup_form(); ?></div></div></div>
@@ -204,7 +205,18 @@ add_action('admin_enqueue_scripts',function(){
  if(feng_setting('admin_appearance','native')==='polar')wp_enqueue_style('polar-admin-skin',get_theme_file_uri('/assets/css/admin-skin.css'),array('common','forms'),feng_asset_version('/assets/css/admin-skin.css'));
 },110);
 
+add_action('customize_controls_enqueue_scripts',function(){
+ if(feng_setting('admin_appearance','native')==='polar')wp_enqueue_style('shanying-admin-customizer',get_theme_file_uri('/assets/css/admin-customizer.css'),array('customize-controls'),feng_asset_version('/assets/css/admin-customizer.css'));
+},110);
+
 add_filter('post_date_column_status',function($status){
  if(feng_setting('admin_appearance','native')!=='polar'||!$status)return $status;
  return '<span class="polar-date-status">'.$status.'</span>';
+});
+
+/* TinyMCE edits inside an iframe, so admin chrome CSS cannot reach its canvas. */
+add_filter('tiny_mce_before_init',function($init){
+ if(feng_setting('admin_appearance','native')!=='polar')return $init;
+ $init['content_style']=($init['content_style']??'').' html{background:#191b1f;color-scheme:dark;}body.mce-content-body{background:#191b1f;color:#eceef1;}body.mce-content-body a{color:#a7d5ff;}body.mce-content-body :is(blockquote,hr,td,th){border-color:#454a53;}';
+ return $init;
 });

@@ -5,7 +5,7 @@
   --xf-soft: #f1f2f5; --xf-width: 1200px; --xf-reading: 760px;
   --xf-radius: 28px; --xf-radius-small: 16px;
   --feng-radius-panel: 36px; --feng-radius-card: 28px; --feng-radius-row: 24px; --feng-radius-thumb: 12px;
-  --xf-font: "Space Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --xf-font: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
   --xf-shadow: 0 18px 55px rgb(20 24 40 / .065);
   --xf-ease: cubic-bezier(.2,.75,.25,1); --xf-duration: 700ms; --feng-motion-enter: 850ms; --feng-motion-reveal: 1000ms; --feng-motion-gentle: cubic-bezier(.4,0,.25,1);
   color-scheme: light;

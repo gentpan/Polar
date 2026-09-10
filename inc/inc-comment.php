@@ -53,13 +53,13 @@ function feng_comment_level($comment){
  $remaining=$next!==null?'距下次升级还差 '.($next-$total).' 条':'已满级';
  $progress=$next!==null?max(0,min(100,round(($total-$tier[0])/($next-$tier[0])*100))):100;
  $tip='共 '.$total.' 条评论，'.$remaining;
- $upgrade=$next!==null?'累计达到 '.$next.' 条评论，升级至 LV-'.($level+1).' · '.$tiers[$index+1][1]:'已达到最高等级，感谢每一次交流。';
+ $rules='';foreach($tiers as $i=>$item){$end=isset($tiers[$i+1])?($tiers[$i+1][0]-1).' 条': '条及以上';$range=isset($tiers[$i+1])?$item[0].'–'.$end:$item[0].' '.$end;$rules.='<span class="feng-level-rule"><span>LV-'.($i+1).' · '.esc_html($item[1]).'</span><span>'.esc_html($range).'</span></span>';}
  return '<span class="feng-comment-level feng-comment-tip feng-level-'.(int)$level.'" tabindex="0" aria-label="'.esc_attr('LV-'.$level.' '.$tier[1].'，'.$tip).'">'
  .'<span class="feng-level-number">LV-'.$level.'</span>'
- .'<span class="feng-level-popover"><span class="feng-level-popover-head"><strong>LV-'.$level.'</strong><i class="fa-solid fa-'.esc_attr($tier[2]).'" aria-hidden="true"></i></span>'
- .'<span class="feng-level-popover-name">'.esc_html($tier[1]).'</span><span class="feng-level-popover-count">已发表 '.(int)$total.' 条评论</span>'
+ .'<span class="feng-level-popover"><span class="feng-level-popover-head"><strong>LV-'.$level.' · '.esc_html($tier[1]).'</strong><i class="fa-solid fa-'.esc_attr($tier[2]).'" aria-hidden="true"></i></span>'
  .'<span class="feng-level-progress" role="progressbar" aria-label="本次升级进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'.(int)$progress.'"><span style="width:'.(int)$progress.'%"></span></span>'
- .'<small>'.esc_html($upgrade).'</small><small>'.esc_html($remaining).'</small></span></span>';
+ .'<span class="feng-level-popover-foot"><small>'.esc_html($remaining).'</small><span class="feng-level-rules"><button type="button" class="feng-level-rules-button" aria-label="查看全部等级规则">等级规则</button><span class="feng-level-rules-list">'.$rules.'</span></span></span></span></span>';
+
 
 }
 /** Match public friend links to the website supplied with a comment. */
@@ -166,23 +166,6 @@ function feng_comment_relative_time($comment){
 function feng_comment_remembered(){
  $c=wp_get_current_commenter();return !empty($c['comment_author'])&&!empty($c['comment_author_email']);
 }
-function feng_comment_number_check(){
- if(is_user_logged_in())return;
- $a=wp_rand(1,9);$b=wp_rand(1,9);$time=time();$payload="$a:$b:$time";
- echo '<div class="feng-number-check"><label for="feng-number-answer">数字验证：'.(int)$a.' + '.(int)$b.' = </label><input id="feng-number-answer" name="feng_number_answer" inputmode="numeric" pattern="[0-9]+" autocomplete="off" aria-label="填写计算结果"><input type="hidden" name="feng_number_challenge" value="'.esc_attr($payload.':'.hash_hmac('sha256',$payload,wp_salt('nonce'))).'"></div>';
-}
-add_action('comment_form','feng_comment_number_check');
-add_filter('preprocess_comment',function($data){
- if((is_admin()&&!wp_doing_ajax())||is_user_logged_in()||!empty($data['comment_type'])&&$data['comment_type']!=='comment')return $data;
- if(feng_comment_remembered()&&empty($_POST['feng_switch_identity']))return $data;
- $raw=isset($_POST['feng_number_challenge'])&&is_string($_POST['feng_number_challenge'])?wp_unslash($_POST['feng_number_challenge']):'';
- $parts=explode(':',$raw);$valid=false;
- if(count($parts)===4){list($a,$b,$time,$sig)=$parts;$payload="$a:$b:$time";$answer=$_POST['feng_number_answer']??'';
-  $valid=ctype_digit($a)&&ctype_digit($b)&&ctype_digit($time)&&time()-(int)$time>=0&&time()-(int)$time<DAY_IN_SECONDS&&hash_equals(hash_hmac('sha256',$payload,wp_salt('nonce')),$sig)&&is_string($answer)&&ctype_digit($answer)&&(int)$answer===(int)$a+(int)$b;
- }
- if(!$valid){if(wp_doing_ajax())wp_send_json_error(array('message'=>'数字验证码不正确或已过期，请检查后重试。'),400);wp_die('数字验证码不正确或已过期，请返回检查。','评论验证',array('response'=>400,'back_link'=>true));}
- return $data;
-});
 add_action('wp_enqueue_scripts',function(){wp_enqueue_script('feng-comment-profile',get_theme_file_uri('/assets/js/comment-profile.js'),array('xf-app'),feng_asset_version('/assets/js/comment-profile.js'),true);});
 
 // Store browser-provided macOS hints only with the newly submitted comment.

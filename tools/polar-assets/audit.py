@@ -3,7 +3,7 @@ from pathlib import Path
 import json,subprocess,sys
 base=Path(__file__).resolve().parent
 root=base.parents[1]
-theme=root
+theme=root/'app/public/wp-content/themes/shanying'
 order=json.loads((base/'bundle-order.json').read_text())
 errors=[]
 for group in ('styles','scripts','admin_scripts'):
@@ -14,7 +14,7 @@ for source in order['scripts'].values():
 listed={Path(v).name for v in order['scripts'].values()}|set(order['admin_scripts'].values())|{'header-lucide.bundle.js','stat-roll.js'}
 for p in (base/'source/assets/js').glob('*.js'):
  if p.name not in listed:errors.append('Unlisted business script: '+p.name)
-listedcss={Path(v).name for v in order['styles'].values() if not v.startswith('https:')}|{'admin.css','admin-square.css','admin-skin.css','editor.css'}
+listedcss={Path(v).name for v in order['styles'].values() if not v.startswith('https:')}|{'admin.css','admin-square.css','admin-skin.css','admin-customizer.css','editor.css'}
 for p in (base/'source/assets/css').glob('*.css'):
  if p.name not in listedcss:errors.append('Unlisted stylesheet: '+p.name)
 js=set((base/'source/assets/js').rglob('*.js'))|set((theme/'assets').rglob('*.js'))

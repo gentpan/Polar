@@ -1,9 +1,9 @@
 """Build local assets in the explicit, dependency-resolved bundle-order.json order."""
 from pathlib import Path
-import json,re,subprocess,urllib.parse
+import json,re,shutil,subprocess,urllib.parse
 base=Path(__file__).resolve().parent
 root=base.parents[1]
-theme=root
+theme=root/'app/public/wp-content/themes/shanying'
 src=base/'source'
 order=json.loads((base/'bundle-order.json').read_text())
 manifest={key:order[key] for key in ('styles','scripts')}
@@ -17,13 +17,13 @@ def css(text,url):
  return re.sub(r'url\(([^)]+)\)',rewrite,text)
 def stylesheet(handle,source):
  if source.startswith('https:'):
-  filename={'feng-title-font':'title.css','feng-space-grotesk':'space.css'}.get(handle,source.rsplit('/',1)[-1])
+  filename={'feng-title-font':'title.css'}.get(handle,source.rsplit('/',1)[-1])
   path=src/'remote'/filename;url=source
  else:path=src/source;url='http://xifeng.local/wp-content/themes/shanying/'+source
  return '\n/* '+handle+' */\n'+css(path.read_text(),url)
 fonts=[];styles=[]
 for handle,source in order['styles'].items():
- (fonts if 'font' in source or handle in ('feng-code-font','feng-space-grotesk') else styles).append(stylesheet(handle,source))
+ (fonts if 'font' in source or handle == 'feng-code-font' else styles).append(stylesheet(handle,source))
 def script(handle,path,enabled):
  return '\n;/* '+handle+' */\nif(window.'+enabled+'.includes('+json.dumps(handle)+')){\n'+path.read_text()+'\n}\n'
 bootstrap="\n;window.polarEnabledScripts=JSON.parse(document.currentScript?.dataset.shanyingModules||'[]');\n"
@@ -35,6 +35,8 @@ scripts.append('\n;/*! Lucide Animated\n'+(lucide/'LICENSE').read_text()+'\n*/\n
 scripts.append('\n;/* Statistic odometer */\n'+(src/'assets/js/stat-roll.js').read_text())
 (theme/'assets/css/main.css').write_text(''.join(fonts+styles))
 (theme/'assets/js/main.js').write_text(''.join(scripts))
+for relative in ('assets/js/article-media.js','assets/vendor/highlight/highlight.min.js'):
+ dest=theme/relative;dest.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(src/relative,dest)
 for path in [theme/'inc/asset-bundles.json',base/'manifest.json']:path.write_text(json.dumps(manifest,indent=2))
 admin=[bootstrap.replace('polarEnabledScripts','polarEnabledAdminScripts')]
 admin += [script(handle,src/'assets/js'/name,'polarEnabledAdminScripts') for handle,name in order['admin_scripts'].items()]
@@ -43,5 +45,6 @@ admincss=[(src/'assets/css'/name).read_text() for name in ('admin.css','admin-sq
 admincss.extend(stylesheet('admin-'+name,'assets/css/'+name) for name in ('tokens.css','editor.css','reading.css'))
 (theme/'assets/css/admin.css').write_text('\n'.join(admincss))
 (theme/'assets/css/admin-skin.css').write_text((src/'assets/css/admin-skin.css').read_text())
+(theme/'assets/css/admin-customizer.css').write_text((src/'assets/css/admin-customizer.css').read_text())
 (theme/'assets/css/admin-square.css').write_text((src/'assets/css/admin-square.css').read_text())
 print(len(styles),'CSS sections;',len(scripts),'JS sections')
